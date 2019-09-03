@@ -26,12 +26,9 @@ class MviFeature<Action, Command, State, Subscription>(
     init {
         featureScope.launch {
             actions.consumeEach { action ->
-                val computation  = reduce(currentState, action)
-                states.send(computation.state)
-                when(computation){
-                    is Pure -> {}
-                    is Effect -> computation.commands.forEach(::call)
-                }
+                val (state, commands) = reduce(currentState, action)
+                states.send(state)
+                commands.forEach(::call)
             }
         }
     }
