@@ -16,7 +16,7 @@ inline fun <T> either(f: () -> T): Either<Exception, T> =
         Either.Left(e)
     }
 
-suspend fun <T> catch(f: suspend () -> T): Either<Exception, T> =
+suspend fun <T> either(f: suspend () -> T): Either<Exception, T> =
     try {
         Either.Right(f())
     } catch (e: Exception) {
