@@ -18,9 +18,7 @@ interface Feature<Action, Command, State, Subscription> {
 
 
 infix fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bindAction(action: Action){
-    featureScope.launch {
-        actions.offer(action)
-    }
+    featureScope.launch { actions.offer(action) }
 }
 
 fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bind(render: Render<State>){

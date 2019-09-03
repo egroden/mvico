@@ -15,17 +15,13 @@ class MviFeature<Action, Command, State, Subscription>(
     override val currentState: State
         get() = states.value
 
-    override val actions: Channel<Action>
-        get() = Channel(Channel.CONFLATED)
+    override val actions = Channel<Action>(Channel.CONFLATED)
 
-    override val states: ConflatedBroadcastChannel<State>
-        get() = ConflatedBroadcastChannel(initialState)
+    override val states = ConflatedBroadcastChannel(initialState)
 
-    override val featureScope: CoroutineScope
-        get() = CoroutineScope(Dispatchers.IO) + SupervisorJob()
+    override val featureScope = CoroutineScope(Dispatchers.IO) + SupervisorJob()
 
-    override val renderScope: CoroutineScope
-        get() = CoroutineScope(Dispatchers.Main) + SupervisorJob()
+    override val renderScope = CoroutineScope(Dispatchers.Main) + SupervisorJob()
 
     init {
         featureScope.launch {
