@@ -5,10 +5,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 
-interface Feature<Action, Command, State, Subscription> {
-    val actions: Channel<Action>
+interface Feature<in Action, Command, out State, out Subscription> {
+    val actions: Channel<in Action>
     val currentState: State
-    val states: ConflatedBroadcastChannel<State>
+    val states: ConflatedBroadcastChannel<out State>
 
     val featureScope: CoroutineScope
     val renderScope: CoroutineScope
