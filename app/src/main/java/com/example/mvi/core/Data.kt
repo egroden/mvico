@@ -9,10 +9,6 @@ sealed class Either<out L, out R> {
     data class Right<T>(val value: T) : Either<Nothing, T>()
 }
 
-fun <A, B, C> ((A) -> B).c(f: (B) -> C): (A) -> C = {
-    f(this(it))
-}
-
 inline fun <T> either(f: () -> T): Either<Exception, T> =
     try {
         Either.Right(f())
