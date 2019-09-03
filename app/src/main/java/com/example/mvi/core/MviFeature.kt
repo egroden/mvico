@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
 
 class MviFeature<Action, Command, State, Subscription>(
-    private val initialState: State,
+    initialState: State,
     private val reduce: Reducer<State, Action, Command>,
     private val commandHandler: CommandHandler<Command, Action>
 ) : Feature<Action, Command, State, Subscription> {
