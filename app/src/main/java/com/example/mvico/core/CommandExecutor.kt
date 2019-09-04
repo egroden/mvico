@@ -1,4 +1,4 @@
-package com.example.mvi.core
+package com.example.mvico.core
 
 import kotlinx.coroutines.flow.Flow
 

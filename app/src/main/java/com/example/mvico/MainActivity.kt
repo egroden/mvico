@@ -1,4 +1,4 @@
-package com.example.mvi
+package com.example.mvico
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
