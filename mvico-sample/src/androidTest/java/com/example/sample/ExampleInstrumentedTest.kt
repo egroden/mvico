@@ -1,4 +1,4 @@
-package com.example.mvico
+package com.example.sample
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.example.mvico.core
+package com.example.mvico
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
