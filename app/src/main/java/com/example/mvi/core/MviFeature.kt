@@ -6,11 +6,22 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collect
 
+/**
+ * @param initialState Initial state for Feature.
+ * @param reduce Function for updating state and creating side effects.
+ * @param commandExecutor Side effects handler
+ * @param onError Function for handling unhandled exceptions.
+ */
 class MviFeature<Action, Command, State, Subscription>(
     initialState: State,
     private val reduce: Reducer<State, Action, Command>,
-    private val commandExecutor: CommandExecutor<Command, Action>
+    private val commandExecutor: CommandExecutor<Command, Action>,
+    private val onError: ((State, Throwable) -> Unit)? = null
 ) : Feature<Action, Command, State, Subscription> {
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        onError?.invoke(currentState, throwable)
+    }
 
     override val currentState: State
         get() = states.value
@@ -19,9 +30,10 @@ class MviFeature<Action, Command, State, Subscription>(
 
     override val states = ConflatedBroadcastChannel(initialState)
 
-    override val featureScope = CoroutineScope(Dispatchers.IO) + SupervisorJob()
+    override val featureScope = CoroutineScope(Dispatchers.IO) + SupervisorJob() + exceptionHandler
 
     override val renderScope = CoroutineScope(Dispatchers.Main) + SupervisorJob()
+
 
     init {
         featureScope.launch {
