@@ -1,4 +1,4 @@
-package com.example.mvi
+package com.example.mvico
 
 import org.junit.Test
 
