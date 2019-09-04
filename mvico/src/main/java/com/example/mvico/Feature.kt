@@ -1,4 +1,4 @@
-package com.example.mvico.core
+package com.example.mvico
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -53,7 +53,7 @@ infix fun <Action, Command, State, Subscription> Feature<Action, Command, State,
     featureScope.launch { actions.offer(action) }
 }
 
-fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bind(render: Render<State>){
+fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bind(render: com.example.mvico.Render<State>){
     renderScope.launch {
         states.openSubscription().consumeEach(render)
     }
