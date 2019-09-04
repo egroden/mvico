@@ -1,1 +1,1 @@
-include ':mvico-sample'
+include ':mvico-sample', ':mvico'
