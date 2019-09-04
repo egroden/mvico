@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.collect
 class MviFeature<Action, Command, State, Subscription>(
     initialState: State,
     private val reduce: Reducer<State, Action, Command>,
-    private val commandHandler: CommandHandler<Command, Action>
+    private val commandExecutor: CommandExecutor<Command, Action>
 ) : Feature<Action, Command, State, Subscription> {
 
     override val currentState: State
@@ -35,7 +35,7 @@ class MviFeature<Action, Command, State, Subscription>(
 
     override fun call(command: Command) {
         featureScope.launch {
-            commandHandler.handle(command).collect{ actions.offer(it) }
+            commandExecutor.execute(command).collect{ actions.offer(it) }
         }
     }
 }
