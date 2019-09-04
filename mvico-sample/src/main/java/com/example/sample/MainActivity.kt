@@ -1,4 +1,4 @@
-package com.example.mvico
+package com.example.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

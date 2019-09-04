@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 
 /**
  * @param initialState Initial state for Feature.
@@ -13,10 +14,10 @@ import kotlinx.coroutines.channels.consumeEach
  */
 class MviFeature<Action, Command, State, Subscription>(
     initialState: State,
-    private val reduce: com.example.mvico.Reducer<State, Action, Command>,
-    private val commandExecutor: com.example.mvico.CommandExecutor<Command, Action>,
+    private val reduce: Reducer<State, Action, Command>,
+    private val commandExecutor: CommandExecutor<Command, Action>,
     private val onError: ((State, Throwable) -> Unit)? = null
-) : com.example.mvico.Feature<Action, Command, State, Subscription> {
+) : Feature<Action, Command, State, Subscription> {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError?.invoke(currentState, throwable)
