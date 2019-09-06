@@ -8,11 +8,11 @@ import kotlinx.coroutines.channels.consumeEach
 /**
  * The main component of architecture.
  * @param Action Type of actions with which the state will change.
- * @param Command Type of side effects.
+ * @param SideEffect Type of side effects.
  * @param State Type of state.
  * @param Subscription Type for one-time messages.
  */
-interface Feature<in Action, Command, out State, out Subscription> {
+interface Feature<in Action, SideEffect, out State, out Subscription> {
 
     /**
      * Actions flow. Used to respond to new actions.
@@ -43,23 +43,23 @@ interface Feature<in Action, Command, out State, out Subscription> {
 
     /**
      * Handles Side Effect.
-     * @param command Command to perform a side effect.
+     * @param sideEffect SideEffect to perform a side effect.
      * For example, download something from a network or database
      */
-    fun call(command: Command)
+    fun call(sideEffect: SideEffect)
 }
 
-infix fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bindAction(action: Action){
+infix fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.bindAction(action: Action){
     featureScope.launch { actions.offer(action) }
 }
 
-fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.bind(render: Render<State>){
+fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.bind(render: Render<State>){
     renderScope.launch {
         states.openSubscription().consumeEach(render)
     }
 }
 
-fun <Action, Command, State, Subscription> Feature<Action, Command, State, Subscription>.unbind(){
+fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.unbind(){
     renderScope.cancel()
 }
 

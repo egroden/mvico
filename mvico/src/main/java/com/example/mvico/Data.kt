@@ -8,7 +8,7 @@ package com.example.mvico
  * @param State Current application state.
  * @param Action Incoming action.
  *
- * @return new state and a command (side-effect) to execute. If you don't wish to execute
+ * @return new state and a command (side-effect) to handle. If you don't wish to handle
  * a side-effect, return Pair<State, emptySet()> , otherwise return Pair<State, setOf()>
  */
 typealias Reducer<State, Action, Command> = (State, Action) -> Pair<State, Set<Command>>
