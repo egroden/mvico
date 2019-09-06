@@ -83,6 +83,7 @@ lint/tmp/
 
 *.iml
 .gradle
+.idea
 /local.properties
 /.idea/libraries
 /.idea/modules.xml
@@ -93,3 +94,4 @@ lint/tmp/
 .externalNativeBuild
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea
+idea
