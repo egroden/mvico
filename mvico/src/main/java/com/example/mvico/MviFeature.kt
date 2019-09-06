@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.collect
 /**
  * @param initialState Initial state for Feature.
  * @param reduce Function for updating state and creating side effects.
- * @param commandExecutor Side effects handler
+ * @param effectHandler Side effects handler
  * @param onError Function for handling unhandled exceptions.
  */
-class MviFeature<Action, Command, State, Subscription>(
+class MviFeature<Action, SideEffect, State, Subscription>(
     initialState: State,
-    private val reduce: Reducer<State, Action, Command>,
-    private val commandExecutor: CommandExecutor<Command, Action>,
+    private val reduce: Reducer<State, Action, SideEffect>,
+    private val effectHandler: EffectHandler<SideEffect, Action>,
     private val onError: ((State, Throwable) -> Unit)? = null
-) : Feature<Action, Command, State, Subscription> {
+) : Feature<Action, SideEffect, State, Subscription> {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError?.invoke(currentState, throwable)
@@ -26,6 +26,7 @@ class MviFeature<Action, Command, State, Subscription>(
     override val currentState: State
         get() = states.value
 
+    //TODO: choose capacity
     override val actions = Channel<Action>(Channel.CONFLATED)
 
     override val states = ConflatedBroadcastChannel(initialState)
@@ -38,16 +39,16 @@ class MviFeature<Action, Command, State, Subscription>(
     init {
         featureScope.launch {
             actions.consumeEach { action ->
-                val (state, commands) = reduce(currentState, action)
+                val (state, sideEffects) = reduce(currentState, action)
                 states.send(state)
-                commands.forEach(::call)
+                sideEffects.forEach(::call)
             }
         }
     }
 
-    override fun call(command: Command) {
+    override fun call(sideEffect: SideEffect) {
         featureScope.launch {
-            commandExecutor.execute(command).collect{ actions.offer(it) }
+            effectHandler.handle(sideEffect).collect{ actions.offer(it) }
         }
     }
 }
