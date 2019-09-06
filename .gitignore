@@ -80,3 +80,16 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+*.iml
+.gradle
+/local.properties
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea
