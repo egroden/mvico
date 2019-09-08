@@ -11,7 +11,7 @@ package com.example.mvico
  * @return new state and a command (side-effect) to handle. If you don't wish to handle
  * a side-effect, return Pair<State, emptySet()> , otherwise return Pair<State, setOf()>
  */
-typealias Reducer<State, Action, Command> = (State, Action) -> Pair<State, Set<Command>>
+typealias Reducer<State, Action, SideEffect> = (State, Action) -> Pair<State, Set<SideEffect>>
 
 /**
  * Called every time the MviFeature produces a new state. Used to display

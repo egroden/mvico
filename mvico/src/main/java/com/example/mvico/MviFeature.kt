@@ -33,9 +33,6 @@ class MviFeature<Action, SideEffect, State, Subscription>(
 
     override val featureScope = CoroutineScope(Dispatchers.IO) + SupervisorJob() + exceptionHandler
 
-    override val renderScope = CoroutineScope(Dispatchers.Main) + SupervisorJob()
-
-
     init {
         featureScope.launch {
             actions.consumeEach { action ->

@@ -36,30 +36,10 @@ interface Feature<in Action, SideEffect, out State, out Subscription> {
     val featureScope: CoroutineScope
 
     /**
-     * Scope for update ui.
-     * TODO: Move control of scope to another place
-     */
-    val renderScope: CoroutineScope
-
-    /**
      * Handles Side Effect.
      * @param sideEffect SideEffect to perform a side effect.
      * For example, download something from a network or database
      */
     fun call(sideEffect: SideEffect)
-}
-
-infix fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.bindAction(action: Action){
-    featureScope.launch { actions.offer(action) }
-}
-
-fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.bind(render: Render<State>){
-    renderScope.launch {
-        states.openSubscription().consumeEach(render)
-    }
-}
-
-fun <Action, SideEffect, State, Subscription> Feature<Action, SideEffect, State, Subscription>.unbind(){
-    renderScope.cancel()
 }
 
