@@ -4,12 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Response(
+class Response(
     val results: List<Movie>
 )
 
 @Serializable
-data class Movie(
+class Movie(
     @SerialName("id") val id: Int = 0,
     @SerialName("vote_count") val voteCount: Int = 0,
     @SerialName("title") val title: String,
