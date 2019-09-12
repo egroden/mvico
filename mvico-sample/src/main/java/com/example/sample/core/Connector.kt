@@ -1,4 +1,4 @@
-package com.example.mvico
+package com.example.sample.core
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
