@@ -10,7 +10,7 @@ import com.example.sample.*
 
 class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
-    private val movies: MutableList<Movie> = ArrayList()
+    private var movies: List<Movie> = arrayListOf()
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int) = MovieViewHolder(
         viewGroup.imageView {
@@ -25,8 +25,7 @@ class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
     fun update(newMovies: List<Movie>) {
         val moviesDiffResult = DiffUtil.calculateDiff(MovieDiffUtilCallback(movies, newMovies))
-        movies.clear()
-        movies.addAll(newMovies)
+        movies = newMovies
         moviesDiffResult.dispatchUpdatesTo(this)
     }
 

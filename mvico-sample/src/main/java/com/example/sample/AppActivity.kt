@@ -8,8 +8,6 @@ import com.example.sample.movies.MovieFragment
 
 class AppActivity : AppCompatActivity() {
 
-    private val frameLayoutID = 1
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(
@@ -32,5 +30,9 @@ class AppActivity : AppCompatActivity() {
                 )
                 .commit()
         }
+    }
+
+    companion object {
+        private const val frameLayoutID = 1
     }
 }
