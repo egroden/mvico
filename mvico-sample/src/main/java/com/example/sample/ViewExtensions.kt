@@ -92,15 +92,19 @@ class Effect<T>(initialValue: T){
     set(value) {
         if (field != value){
             field = value
-            change(value)
+            change?.invoke(value)
         }
     }
 
-    var change: (T) -> Unit = {}
+    var change: ((T) -> Unit)? = null
 }
 
 infix fun <T> Effect<T>.bind(body: (T) -> Unit){
     change = body
+}
+
+fun <T> Effect<T>.unbind(){
+    change = null
 }
 
 fun ImageView.load(url: String){

@@ -65,6 +65,13 @@ class MovieFragment(private val connector: Connector<Action, SideEffect, State, 
         connector.disconnect()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        progressBarEffect.unbind()
+        recyclerValueEffect.unbind()
+        recyclerVisibilityEffect.unbind()
+    }
+
     companion object {
         const val TAG = "MovieFragment"
     }
