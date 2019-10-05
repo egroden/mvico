@@ -1,1 +1,3 @@
-include ':mvico-sample', ':mvico', ':mvico-android'
+rootProject.name = 'mvico'
+
+include ':mvico-mpp', ':mvico-sample'
