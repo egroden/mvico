@@ -3,6 +3,7 @@ package com.egroden.sample.movies
 import com.egroden.mvico.EffectHandler
 import com.egroden.mvico.Reducer
 import com.egroden.sample.Either
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class Subscription
@@ -26,31 +27,27 @@ data class State(
 val movieReducer = object : Reducer<State, Action, SideEffect> {
     override fun invoke(state: State, action: Action) =
         when (action) {
-            is Action.LoadAction -> state.copy(loading = true, data = null, error = null) to setOf(
-                SideEffect.LoadMovies(action.page)
-            )
-            is Action.ShowResult -> state.copy(
-                loading = false,
-                data = action.result,
-                error = null
-            ) to emptySet()
-            is Action.ShowError -> state.copy(
-                loading = false,
-                data = null,
-                error = action.error
-            ) to emptySet()
+            is Action.LoadAction ->
+                state.copy(loading = true, data = null, error = null) to setOf(
+                    SideEffect.LoadMovies(action.page)
+                )
+            is Action.ShowResult ->
+                state.copy(loading = false, data = action.result, error = null) to emptySet()
+            is Action.ShowError ->
+                state.copy(loading = false, data = null, error = action.error) to emptySet()
         }
 }
 
 class MovieEffectHandler(
     private val movieRepository: MovieRepository
 ) : EffectHandler<SideEffect, Action> {
-    override fun handle(sideEffect: SideEffect) = when (sideEffect) {
-        is SideEffect.LoadMovies -> flow {
-            when (val result = movieRepository.loadMovies(sideEffect.page)) {
-                is Either.Left -> emit(Action.ShowError(result.value))
-                is Either.Right -> emit(Action.ShowResult(result.value))
-            }
+    override fun handle(sideEffect: SideEffect): Flow<Action> = flow {
+        when (sideEffect) {
+            is SideEffect.LoadMovies ->
+                when (val result = movieRepository.loadMovies(sideEffect.page)) {
+                    is Either.Left -> emit(Action.ShowError(result.value))
+                    is Either.Right -> emit(Action.ShowResult(result.value))
+                }
         }
     }
 }

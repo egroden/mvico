@@ -7,15 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.egroden.mvico.Connector
-import com.egroden.mvico.bindAction
-import com.egroden.mvico.connect
-import com.egroden.mvico.disconnect
 import com.egroden.sample.*
 
 class MovieFragment(
     private val connector: Connector<Action, SideEffect, State, Subscription>
 ) : Fragment() {
-
     private val recyclerValueEffect = Effect<List<Movie>>(emptyList())
     private val recyclerVisibilityEffect = Effect(Visibility.VISIBLE)
     private val progressBarEffect = Effect(Visibility.GONE)
@@ -45,7 +41,6 @@ class MovieFragment(
         super.onViewCreated(view, savedInstanceState)
         connector bindAction Action.LoadAction(1)
     }
-
 
     override fun onStart() {
         super.onStart()

@@ -1,6 +1,5 @@
 package com.egroden.mvico
 
-
 /**
  * Updates the current application state and provides a way to schedule the execution
  * of a side effect.

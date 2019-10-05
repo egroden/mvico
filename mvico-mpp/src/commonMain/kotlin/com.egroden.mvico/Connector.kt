@@ -7,25 +7,21 @@ class Connector<Action, SideEffect, State, Subscription>(
     val feature: Feature<Action, SideEffect, State, Subscription>
 ) {
     val renderScope: CoroutineScope = MainScope()
-}
 
-infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
-    action: Action
-) {
-    with(feature) {
-        featureScope.launch { actions.offer(action) }
+    infix fun bindAction(action: Action) {
+        with(feature) {
+            featureScope.launch { actions.send(action) }
+        }
     }
-}
 
-@UseExperimental(ObsoleteCoroutinesApi::class)
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
-    render: Render<State>
-) {
-    renderScope.launch {
-        feature.states.consumeEach(render)
+    @UseExperimental(ObsoleteCoroutinesApi::class)
+    fun connect(render: Render<State>) {
+        renderScope.launch {
+            feature.states.consumeEach(render)
+        }
     }
-}
 
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {
-    renderScope.cancel()
+    fun disconnect() {
+        renderScope.coroutineContext.cancelChildren()
+    }
 }
