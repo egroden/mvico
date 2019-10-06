@@ -21,7 +21,8 @@ data class State(
     val error: Throwable? = null
 )
 
-class MovieReducer(private val domain: Domain) : Reducer<State, Action, CommonEffectHandler.Effect<Action>> {
+class MovieReducer(private val domain: Domain) :
+    Reducer<State, Action, CommonEffectHandler.Effect<Action>> {
     override fun invoke(state: State, action: Action) =
         when (action) {
             is Action.LoadAction ->
@@ -50,12 +51,18 @@ class Domain(private val movieClient: OkHttpClient, private val baseUrl: HttpUrl
                     .build()
             )
             .build()
-        val webEffect = SideEffects.WebEffect(movieClient, request)
-        return handleResponse(webEffect.invoke(), Response.serializer()).map(::handleResult)
+
+        return SideEffects.WebEffect(movieClient, request)
+            .invoke()
+            .let { handleResponse(it, Response.serializer()) }
+            .map(::handleResult)
     }
 
-    private fun <T> handleResponse(response: String, deserializationStrategy: DeserializationStrategy<T>) =
-        object : Eff<T>{
+    private fun <T> handleResponse(
+        response: String,
+        deserializationStrategy: DeserializationStrategy<T>
+    ) =
+        object : Eff<T> {
             override fun invoke() =
                 Json.nonstrict.parse(deserializationStrategy, response)
         }
