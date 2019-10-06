@@ -6,6 +6,10 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlinx-serialization'
 
+androidExtensions {
+    experimental = true
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -43,6 +47,10 @@ android {
     }
 
     kotlinOptions.freeCompilerArgs += [ "-Xuse-experimental=kotlin.Experimental" ]
+
+    configurations.all {
+        resolutionStrategy.force "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha04"
+    }
 }
 
 dependencies {

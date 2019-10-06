@@ -1,22 +1,24 @@
-package com.egroden.teaco.sample.movies
+package com.egroden.teaco.sample.presentation.movie
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.SavedStateHandle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.egroden.teaco.AndroidConnector
 import com.egroden.teaco.androidConnectors
-import com.egroden.teaco.sample.*
+import com.egroden.teaco.sample.R
+import com.egroden.teaco.sample.presentation.*
+import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
+import kotlinx.android.synthetic.main.movie_fragment.view.*
 
 class MovieFragment(
     factory: (SavedStateHandle) -> AndroidConnector<Action, SideEffect, State, Subscription>
-) : Fragment() {
+) : Fragment(R.layout.movie_fragment) {
     private val connector by androidConnectors(factory)
 
-    private val recyclerValueEffect = Effect<List<Movie>>(emptyList())
+    private val recyclerValueEffect =
+        Effect<List<MovieModel>>(emptyList())
     private val recyclerVisibilityEffect =
         Effect(Visibility.VISIBLE)
     private val progressBarEffect =
@@ -27,39 +29,39 @@ class MovieFragment(
         connector.connect(::render, lifecycle)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) =
-        frameLayout {
-            recyclerView {
-                size(Size.MATCH_PARENT, Size.MATCH_PARENT)
-                layoutManager(GridLayoutManager(context, 2))
-                adapter(MovieAdapter())
-                recyclerValueEffect bind { (adapter as MovieAdapter).update(it) }
-                recyclerVisibilityEffect bind { visibility(it) }
-            }
-            progressBar {
-                size(Size.WRAP_CONTENT, Size.WRAP_CONTENT)
-                visibility(Visibility.GONE)
-                gravity(Gravity.CENTER)
-                progressBarEffect bind { visibility(it) }
-            }
-        }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        with(view.movie_recycler_view) {
+            val movieAdapter = MovieAdapter()
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = movieAdapter
+            recyclerValueEffect bind { movieAdapter.update(it) }
+            recyclerVisibilityEffect bind { visibility(it) }
+        }
+
+        with(view.progress_bar) {
+            visibility(Visibility.GONE)
+            progressBarEffect bind { visibility(it) }
+        }
+
         connector bindAction Action.LoadAction(1)
     }
 
     private fun render(state: State) {
-        progressBarEffect.value = if (state.loading) Visibility.VISIBLE else Visibility.GONE
+        if (state.loading) {
+            progressBarEffect.value = Visibility.VISIBLE
+            recyclerVisibilityEffect.value = Visibility.GONE
+        } else {
+            progressBarEffect.value = Visibility.GONE
+            recyclerVisibilityEffect.value = Visibility.VISIBLE
+        }
+
         state.data?.let { recyclerValueEffect.value = it }
-        recyclerVisibilityEffect.value = if (state.loading) Visibility.GONE else Visibility.VISIBLE
-        state.error?.let {
+        if (state.error != null) {
             progressBarEffect.value = Visibility.GONE
             recyclerVisibilityEffect.value = Visibility.GONE
+            view?.context?.toast(state.error.toString())
         }
     }
 

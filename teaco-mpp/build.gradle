@@ -65,6 +65,10 @@ kotlin {
     }
 }
 
+configurations.all {
+    resolutionStrategy.force "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha04"
+}
+
 android {
     compileSdkVersion 29
     defaultConfig {

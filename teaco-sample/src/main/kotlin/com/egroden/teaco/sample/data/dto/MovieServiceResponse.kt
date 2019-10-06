@@ -1,15 +1,15 @@
-package com.egroden.teaco.sample.movies
+package com.egroden.teaco.sample.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class Response(
-    val results: List<Movie>
+    val results: List<MovieDto>
 )
 
 @Serializable
-class Movie(
+class MovieDto(
     @SerialName("id") val id: Int = 0,
     @SerialName("vote_count") val voteCount: Int = 0,
     @SerialName("title") val title: String,

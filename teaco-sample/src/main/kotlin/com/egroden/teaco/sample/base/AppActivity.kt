@@ -1,25 +1,20 @@
-package com.egroden.teaco.sample
+package com.egroden.teaco.sample.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.egroden.teaco.sample.movies.MovieFragment
+import com.egroden.teaco.sample.R
+import com.egroden.teaco.sample.presentation.movie.MovieFragment
 
 class AppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(
-            frameLayout {
-                id(frameLayoutID)
-                size(Size.MATCH_PARENT, Size.MATCH_PARENT)
-            }
-        )
+        setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            println("start transaction")
             supportFragmentManager.beginTransaction()
                 .addToBackStack("movies")
                 .add(
-                    frameLayoutID,
+                    R.id.activity_main,
                     supportFragmentManager.fragmentFactory.instantiate(
                         classLoader,
                         MovieFragment::class.java.name
@@ -28,9 +23,5 @@ class AppActivity : AppCompatActivity() {
                 )
                 .commit()
         }
-    }
-
-    companion object {
-        private const val frameLayoutID = 1
     }
 }
