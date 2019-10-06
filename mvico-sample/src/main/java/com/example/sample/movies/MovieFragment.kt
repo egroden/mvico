@@ -1,18 +1,19 @@
 package com.example.sample.movies
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.sample.core.Connector
-import com.example.sample.core.bindAction
-import com.example.sample.core.connect
-import com.example.sample.core.disconnect
 import com.example.sample.*
+import com.example.sample.core.*
 
-class MovieFragment(private val connector: Connector<Action, SideEffect, State, Subscription>) : Fragment() {
+@SuppressLint("ValidFragment")
+class MovieFragment(
+    private val connector: Connector<Action, CommonEffectHandler.Effect<Action>, State, Subscription>
+) : Fragment() {
 
     private val recyclerValueEffect = Effect<List<Movie>>(emptyList())
     private val recyclerVisibilityEffect = Effect(Visibility.VISIBLE)
