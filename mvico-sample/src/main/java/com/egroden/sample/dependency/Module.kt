@@ -2,19 +2,21 @@ package com.egroden.sample.dependency
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import com.egroden.mvico.Connector
-import com.egroden.mvico.MviFeature
+import androidx.lifecycle.SavedStateHandle
+import com.egroden.mvico.AndroidConnector
 import com.egroden.sample.movies.*
 
 interface Module
 
 class MoviesFragmentModule(movieRepository: MovieRepository) : Module {
-    private val feature = MviFeature<Action, SideEffect, State, Subscription>(
-        initialState = State(false, null, null),
-        reduce = movieReducer,
-        effectHandler = MovieEffectHandler(movieRepository)
-    )
-    val connector = Connector(feature)
+    val factory: (SavedStateHandle) -> AndroidConnector<Action, SideEffect, State, Subscription> = {
+        AndroidConnector(
+            initialState = State(false, null, null),
+            reduce = movieReducer,
+            effectHandler = MovieEffectHandler(movieRepository),
+            savedStateHandle = it
+        )
+    }
 }
 
 class AppFragmentFactory(
@@ -22,7 +24,7 @@ class AppFragmentFactory(
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return when (className) {
-            MovieFragment::class.java.name -> MovieFragment(moviesFragmentModule.connector)
+            MovieFragment::class.java.name -> MovieFragment(moviesFragmentModule.factory)
             else -> super.instantiate(classLoader, className)
         }
     }

@@ -24,18 +24,17 @@ data class State(
     val error: Throwable? = null
 )
 
-val movieReducer = object : Reducer<State, Action, SideEffect> {
-    override fun invoke(state: State, action: Action) =
-        when (action) {
-            is Action.LoadAction ->
-                state.copy(loading = true, data = null, error = null) to setOf(
-                    SideEffect.LoadMovies(action.page)
-                )
-            is Action.ShowResult ->
-                state.copy(loading = false, data = action.result, error = null) to emptySet()
-            is Action.ShowError ->
-                state.copy(loading = false, data = null, error = action.error) to emptySet()
-        }
+val movieReducer: Reducer<State, Action, SideEffect> = { state, action ->
+    when (action) {
+        is Action.LoadAction ->
+            state.copy(loading = true, data = null, error = null) to setOf(
+                SideEffect.LoadMovies(action.page)
+            )
+        is Action.ShowResult ->
+            state.copy(loading = false, data = action.result, error = null) to emptySet()
+        is Action.ShowError ->
+            state.copy(loading = false, data = null, error = action.error) to emptySet()
+    }
 }
 
 class MovieEffectHandler(
