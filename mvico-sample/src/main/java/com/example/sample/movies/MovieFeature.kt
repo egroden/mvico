@@ -42,6 +42,24 @@ val movieReducer = object : Reducer<State, Action, SideEffect> {
         }
 }
 
+val reducer = { state: State, action: Action ->
+    when (action) {
+        is Action.LoadAction -> state.copy(loading = true, data = null, error = null) to setOf(
+            SideEffect.LoadMovies(action.page)
+        )
+        is Action.ShowResult -> state.copy(
+            loading = false,
+            data = action.result,
+            error = null
+        ) to emptySet()
+        is Action.ShowError -> state.copy(
+            loading = false,
+            data = null,
+            error = action.error
+        ) to emptySet()
+    }
+}
+
 class MovieEffectHandler(private val movieRepository: MovieRepository) :
     EffectHandler<SideEffect, Action> {
     override fun handle(sideEffect: SideEffect) = when (sideEffect) {

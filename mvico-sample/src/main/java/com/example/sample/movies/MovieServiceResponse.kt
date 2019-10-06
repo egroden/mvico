@@ -20,3 +20,4 @@ class Movie(
     @SerialName("release_date") val releaseDate: String,
     @SerialName("popularity") val rating: Double
 )
+

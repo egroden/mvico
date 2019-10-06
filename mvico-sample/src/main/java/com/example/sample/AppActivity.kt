@@ -2,8 +2,6 @@ package com.example.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
 import com.example.sample.movies.MovieFragment
 
 class AppActivity : AppCompatActivity() {

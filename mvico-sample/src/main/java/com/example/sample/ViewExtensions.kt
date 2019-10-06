@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 inline fun Activity.frameLayout(block: FrameLayout.() -> Unit) = FrameLayout(this).apply(block)
 
@@ -112,6 +113,7 @@ fun ImageView.load(url: String){
 fun ImageView.loadMoviePreview(url: String){
     Glide.with(this)
         .load("${BuildConfig.POSTER_URL}w185/$url")
+        .transform(RoundedCorners(20))
         .into(this)
 }
 
