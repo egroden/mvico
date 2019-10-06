@@ -25,9 +25,8 @@ class MviFeature<Action, SideEffect, State, Subscription>(
 
     override val currentState: State
         get() = states.value
-
-    //TODO: choose capacity
-    override val actions = Channel<Action>(Channel.CONFLATED)
+    
+    override val actions = Channel<Action>()
 
     override val states = ConflatedBroadcastChannel(initialState)
 
