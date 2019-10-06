@@ -1,31 +1,23 @@
 package com.example.mvico
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
-class Connector<Action, SideEffect, State, Subscription>(val feature: Feature<Action, SideEffect, State, Subscription>) {
-    val renderScope: CoroutineScope = MainScope()
-}
-
-infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
-    action: Action
+class Connector<Action, SideEffect, State, Subscription>(
+    private val renderScope: CoroutineScope,
+    private val feature: Feature<Action, SideEffect, State, Subscription>
 ) {
-    with(feature) {
-        featureScope.launch { actions.offer(action) }
+    infix fun bindAction(action: Action) {
+        feature.featureScope.launch { feature.actions.offer(action) }
     }
-}
 
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
-    render: Render<State>
-) {
-    renderScope.launch {
-        feature.states.consumeEach(render)
+    fun connect(render: Render<State>) {
+        renderScope.launch {
+            feature.states.consumeEach(render)
+        }
     }
-}
 
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {
-    renderScope.cancel()
+    fun disconnect() = renderScope.cancel()
 }

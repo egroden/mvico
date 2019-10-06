@@ -5,8 +5,10 @@ import androidx.fragment.app.FragmentFactory
 import com.example.mvico.CommonEffectHandler
 import com.example.mvico.Connector
 import com.example.mvico.MviFeature
+import com.example.mvico_android.AndroidConnector
 import com.example.sample.BuildConfig
 import com.example.sample.movies.*
+import kotlinx.coroutines.MainScope
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
@@ -16,13 +18,14 @@ class MoviesModule(domain: Domain){
         reduce = MovieReducer(domain),
         effectHandler = CommonEffectHandler()
     )
-    val connector = Connector(feature)
+    val connector = Connector(MainScope(), feature)
+    val androidConnector = AndroidConnector(connector)
 }
 
 class AppFragmentFactory(private val moviesModule: MoviesModule): FragmentFactory(){
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return when(className){
-            MovieFragment::class.java.name -> MovieFragment(moviesModule.connector)
+            MovieFragment::class.java.name -> MovieFragment(moviesModule.androidConnector)
             else -> super.instantiate(classLoader, className)
         }
     }

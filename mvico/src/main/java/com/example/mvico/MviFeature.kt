@@ -25,7 +25,7 @@ class MviFeature<Action, SideEffect, State, Subscription>(
 
     override val currentState: State
         get() = states.value
-    
+
     override val actions = Channel<Action>()
 
     override val states = ConflatedBroadcastChannel(initialState)
