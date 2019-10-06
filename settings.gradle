@@ -1,3 +1,3 @@
-rootProject.name = 'mvico'
+rootProject.name = 'teaco'
 
-include ':mvico-mpp', ':mvico-sample'
+include ':teaco-mpp', ':teaco-sample'

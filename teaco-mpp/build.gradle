@@ -1,0 +1,112 @@
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: 'com.android.library'
+apply plugin: "org.jetbrains.kotlin.multiplatform"
+
+kotlin {
+    android()
+    // This is for iPhone emulator
+    // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
+    iosX64("ios") {
+        binaries {
+            framework()
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutines_version"
+            }
+        }
+        commonTest {
+            dependencies {
+        		implementation kotlin('test-common')
+        		implementation kotlin('test-annotations-common')
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation kotlin('stdlib')
+
+                implementation "androidx.appcompat:appcompat:1.1.0"
+                implementation "androidx.fragment:fragment-ktx:1.1.0-rc03"
+                implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+                implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+                implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha04"
+
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+            }
+        }
+        androidTest {
+            dependencies {
+                implementation kotlin('test')
+                implementation kotlin('test-junit')
+            }
+        }
+        iosMain {
+            dependencies {
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:$coroutines_version"
+            }
+        }
+        iosTest {
+        }
+
+        all {
+            languageSettings {
+                useExperimentalAnnotation('kotlin.Experimental')
+            }
+        }
+    }
+}
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 29
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/androidMain/kotlin']
+            res.srcDirs = ['src/androidMain/resources']
+            manifest.srcFile 'src/androidMain/AndroidManifest.xml'
+        }
+        test {
+            java.srcDirs = ['src/androidTest/kotlin']
+        }
+    }
+}
+
+// This task attaches native framework built from ios module to Xcode project
+// (see iosApp directory). Don't run this task directly,
+// Xcode runs this task itself during its build process.
+// Before opening the project from iosApp directory in Xcode,
+// make sure all Gradle infrastructure exists (gradle.wrapper, gradlew).
+task copyFramework {
+    def buildType = project.findProperty('kotlin.build.type') ?: 'DEBUG'
+    def target = project.findProperty('kotlin.target') ?: 'ios'
+    dependsOn kotlin.targets."$target".binaries.getFramework(buildType).linkTask
+
+    doLast {
+        def srcFile = kotlin.targets."$target".binaries.getFramework(buildType).outputFile
+        def targetDir = getProperty('configuration.build.dir')
+        copy {
+            from srcFile.parent
+            into targetDir
+            include 'app.framework/**'
+            include 'app.framework.dSYM'
+        }
+    }
+}
