@@ -3,18 +3,16 @@ package com.example.sample.dependency
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import com.example.sample.AppActivity
 
-class Injector(private val moviesFragmentModule: MoviesFragmentModule): Application.ActivityLifecycleCallbacks {
+class ActivityInjector(private val moviesModule: MoviesModule): Application.ActivityLifecycleCallbacks {
 
     override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
         when(activity){
             is AppActivity -> (activity as? FragmentActivity)
                 ?.supportFragmentManager
-                ?.fragmentFactory = AppFragmentFactory(moviesFragmentModule)
+                ?.fragmentFactory = AppFragmentFactory(moviesModule)
         }
     }
 

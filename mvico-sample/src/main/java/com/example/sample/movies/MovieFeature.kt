@@ -1,9 +1,9 @@
 package com.example.sample.movies
 
-import com.example.sample.core.EffectHandler
-import com.example.sample.core.Reducer
-import com.example.sample.Either
-import kotlinx.coroutines.flow.flow
+import com.example.mvico.*
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class Subscription
 
@@ -13,22 +13,18 @@ sealed class Action {
     class ShowError(val error: Throwable) : Action()
 }
 
-sealed class SideEffect {
-    class LoadMovies(val page: Int) : SideEffect()
-}
-
 data class State(
     val loading: Boolean = false,
     val data: List<Movie>? = null,
     val error: Throwable? = null
 )
 
-val movieReducer = object : Reducer<State, Action, SideEffect> {
+class MovieReducer(private val domain: Domain) : Reducer<State, Action, CommonEffectHandler.Effect<Action>> {
     override fun invoke(state: State, action: Action) =
         when (action) {
-            is Action.LoadAction -> state.copy(loading = true, data = null, error = null) to setOf(
-                SideEffect.LoadMovies(action.page)
-            )
+            is Action.LoadAction ->
+                state.copy(loading = true, data = null, error = null) to
+                        setOf(CommonEffectHandler.Effect(domain.makeWebEffect(action.page)))
             is Action.ShowResult -> state.copy(
                 loading = false,
                 data = action.result,
@@ -42,33 +38,22 @@ val movieReducer = object : Reducer<State, Action, SideEffect> {
         }
 }
 
-val reducer = { state: State, action: Action ->
-    when (action) {
-        is Action.LoadAction -> state.copy(loading = true, data = null, error = null) to setOf(
-            SideEffect.LoadMovies(action.page)
-        )
-        is Action.ShowResult -> state.copy(
-            loading = false,
-            data = action.result,
-            error = null
-        ) to emptySet()
-        is Action.ShowError -> state.copy(
-            loading = false,
-            data = null,
-            error = action.error
-        ) to emptySet()
+class Domain(private val movieClient: OkHttpClient, private val baseUrl: HttpUrl) {
+    fun makeWebEffect(page: Int): Eff<Action> {
+        val request = Request.Builder()
+            .url(
+                baseUrl.newBuilder()
+                    .addQueryParameter("sort_by", "popularity.desc")
+                    .addQueryParameter("page", page.toString())
+                    .build()
+            )
+            .build()
+        val webEffect = SideEffects.WebEffect(movieClient, request, Response.serializer())
+        return webEffect.map { handleResponse(it) }
+    }
+
+    private fun handleResponse(result: Either<Exception, Response>): Action = when (result) {
+        is Either.Left -> Action.ShowError(result.value)
+        is Either.Right -> Action.ShowResult(result.value.results)
     }
 }
-
-class MovieEffectHandler(private val movieRepository: MovieRepository) :
-    EffectHandler<SideEffect, Action> {
-    override fun handle(sideEffect: SideEffect) = when (sideEffect) {
-        is SideEffect.LoadMovies -> flow {
-            when (val result = movieRepository.loadMovies(sideEffect.page)) {
-                is Either.Left -> emit(Action.ShowError(result.value))
-                is Either.Right -> emit(Action.ShowResult(result.value))
-            }
-        }
-    }
-}
-

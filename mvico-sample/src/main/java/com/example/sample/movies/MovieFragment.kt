@@ -6,17 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.sample.core.Connector
-import com.example.sample.core.bindAction
-import com.example.sample.core.connect
-import com.example.sample.core.disconnect
+import com.example.mvico.*
 import com.example.sample.*
 
-class MovieFragment(private val connector: Connector<Action, SideEffect, State, Subscription>) : Fragment() {
+class MovieFragment(
+    private val connector: Connector<Action, CommonEffectHandler.Effect<Action>, State, Subscription>
+) : Fragment() {
 
-    private val recyclerValueEffect = Effect<List<Movie>>(emptyList())
-    private val recyclerVisibilityEffect = Effect(Visibility.VISIBLE)
-    private val progressBarEffect = Effect(Visibility.GONE)
+    private val recyclerValueEffect = ViewEffect<List<Movie>>(emptyList())
+    private val recyclerVisibilityEffect = ViewEffect(Visibility.VISIBLE)
+    private val progressBarEffect = ViewEffect(Visibility.GONE)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +62,13 @@ class MovieFragment(private val connector: Connector<Action, SideEffect, State, 
     override fun onStop() {
         super.onStop()
         connector.disconnect()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        progressBarEffect.unbind()
+        recyclerValueEffect.unbind()
+        recyclerVisibilityEffect.unbind()
     }
 
     companion object {

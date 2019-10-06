@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 inline fun Activity.frameLayout(block: FrameLayout.() -> Unit) = FrameLayout(this).apply(block)
 
@@ -88,20 +87,24 @@ enum class Gravity(val value: Int){
     END(android.view.Gravity.END)
 }
 
-class Effect<T>(initialValue: T){
+class ViewEffect<T>(initialValue: T){
     var value = initialValue
     set(value) {
         if (field != value){
             field = value
-            change(value)
+            change?.invoke(value)
         }
     }
 
-    var change: (T) -> Unit = {}
+    var change: ((T) -> Unit)? = null
 }
 
-infix fun <T> Effect<T>.bind(body: (T) -> Unit){
+infix fun <T> ViewEffect<T>.bind(body: (T) -> Unit){
     change = body
+}
+
+fun <T> ViewEffect<T>.unbind(){
+    change = null
 }
 
 fun ImageView.load(url: String){
@@ -113,7 +116,6 @@ fun ImageView.load(url: String){
 fun ImageView.loadMoviePreview(url: String){
     Glide.with(this)
         .load("${BuildConfig.POSTER_URL}w185/$url")
-        .transform(RoundedCorners(20))
         .into(this)
 }
 
