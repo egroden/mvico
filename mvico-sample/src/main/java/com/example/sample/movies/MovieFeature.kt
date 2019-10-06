@@ -1,8 +1,8 @@
 package com.example.sample.movies
 
-import android.os.Parcelable
 import com.example.mvico.*
-import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -50,11 +50,17 @@ class Domain(private val movieClient: OkHttpClient, private val baseUrl: HttpUrl
                     .build()
             )
             .build()
-        val webEffect = SideEffects.WebEffect(movieClient, request, Response.serializer())
-        return webEffect.map { handleResponse(it) }
+        val webEffect = SideEffects.WebEffect(movieClient, request)
+        return handleResponse(webEffect.invoke(), Response.serializer()).map(::handleResult)
     }
 
-    private fun handleResponse(result: Either<Exception, Response>): Action = when (result) {
+    private fun <T> handleResponse(response: String, deserializationStrategy: DeserializationStrategy<T>) =
+        object : Eff<T>{
+            override fun invoke() =
+                Json.nonstrict.parse(deserializationStrategy, response)
+        }
+
+    private fun handleResult(result: Either<Exception, Response>): Action = when (result) {
         is Either.Left -> Action.ShowError(result.value)
         is Either.Right -> Action.ShowResult(result.value.results)
     }
