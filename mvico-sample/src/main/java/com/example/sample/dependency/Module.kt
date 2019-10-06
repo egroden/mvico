@@ -2,6 +2,7 @@ package com.example.sample.dependency
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import com.example.sample.core.CommonEffectHandler
 import com.example.sample.core.Connector
 import com.example.sample.core.MviFeature
 import com.example.sample.movies.*
@@ -9,10 +10,10 @@ import com.example.sample.movies.*
 interface Module
 
 class MoviesFragmentModule(movieRepository: MovieRepository): Module {
-    private val feature = MviFeature<Action, SideEffect, State, Subscription>(
+    private val feature = MviFeature<Action, CommonEffectHandler.Effect<Action>, State, Subscription>(
         initialState = State(false, null, null),
         reduce = movieReducer,
-        effectHandler = MovieEffectHandler(movieRepository)
+        effectHandler = CommonEffectHandler()
     )
     val connector = Connector(feature)
 }
