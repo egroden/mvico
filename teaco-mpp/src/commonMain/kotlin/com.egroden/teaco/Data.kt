@@ -1,5 +1,7 @@
 package com.egroden.teaco
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * Updates the current application state and provides a way to schedule the execution
  * of a side effect.
@@ -19,3 +21,10 @@ typealias Updater<State, Action, SideEffect> = (State, Action) -> Pair<State, Se
  * @param State the latest state to display
  */
 typealias Render<State> = (State) -> Unit
+
+/**
+ * Your business logic should be here.
+ * @param SideEffect Type of side effects.
+ * @param Action Type of actions with which the state will change.
+ */
+typealias EffectHandler<SideEffect, Action> = (SideEffect) -> Flow<Action>

@@ -3,7 +3,6 @@ package com.egroden.teaco.sample.di
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import androidx.fragment.app.FragmentActivity
 import com.egroden.teaco.sample.base.AppActivity
 import com.egroden.teaco.sample.di.modules.MoviesModule
 
@@ -11,11 +10,7 @@ class ActivityInjector(
     private val moviesModule: MoviesModule
 ) : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
-        when (activity) {
-            is AppActivity -> (activity as? FragmentActivity)
-                ?.supportFragmentManager
-                ?.fragmentFactory = AppFragmentFactory(moviesModule)
-        }
+        (activity as? AppActivity)?.fragmentFactory = AppFragmentFactory(moviesModule)
     }
 
     override fun onActivityPaused(activity: Activity?) = Unit

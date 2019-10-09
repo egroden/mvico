@@ -46,7 +46,7 @@ class MviFeature<Action, SideEffect, State, Subscription>(
     override fun call(sideEffect: SideEffect) {
         featureScope.launch {
             effectHandler
-                .handle(sideEffect)
+                .invoke(sideEffect)
                 .collect { actions.send(it) }
         }
     }

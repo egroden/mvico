@@ -6,6 +6,7 @@ import com.egroden.teaco.Updater
 import com.egroden.teaco.sample.Either
 import com.egroden.teaco.sample.data.repo.MovieRepository
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class Subscription
@@ -56,7 +57,7 @@ val movieUpdater: Updater<State, Action, SideEffect> = { state, action ->
 class MovieEffectHandler(
     private val movieRepository: MovieRepository
 ) : EffectHandler<SideEffect, Action> {
-    override fun handle(sideEffect: SideEffect) = flow<Action> {
+    override fun invoke(sideEffect: SideEffect): Flow<Action> = flow {
         when (sideEffect) {
             is SideEffect.LoadMovies ->
                 when (val result = movieRepository.loadMovies(sideEffect.page)) {

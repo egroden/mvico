@@ -25,6 +25,7 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
     init {
         val defState = savedStateHandle.get<State>(stateKey) ?: initialState
         connector = Connector(
+            renderScope = viewModelScope,
             feature = MviFeature(defState, update, effectHandler, onError)
         )
         viewModelScope.launch {
