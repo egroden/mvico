@@ -2,6 +2,7 @@ package com.egroden.teaco.sample.presentation.movie
 
 import android.os.Parcelable
 import com.egroden.teaco.EffectHandler
+import com.egroden.teaco.UpdateResponse
 import com.egroden.teaco.Updater
 import com.egroden.teaco.sample.Either
 import com.egroden.teaco.sample.data.repo.MovieRepository
@@ -41,16 +42,21 @@ class MovieModel(
     val rating: Double
 ) : Parcelable
 
-val movieUpdater: Updater<State, Action, SideEffect> = { state, action ->
+val movieUpdater: Updater<State, Action, Subscription, SideEffect> = { state, action ->
     when (action) {
         is Action.LoadAction ->
-            state.copy(loading = true, data = null, error = null) to setOf(
-                SideEffect.LoadMovies(action.page)
+            UpdateResponse(
+                state = state.copy(loading = true, data = null, error = null),
+                sideEffects = setOf(SideEffect.LoadMovies(action.page))
             )
         is Action.ShowResult ->
-            state.copy(loading = false, data = action.result, error = null) to emptySet()
+            UpdateResponse(
+                state = state.copy(loading = false, data = action.result, error = null)
+            )
         is Action.ShowError ->
-            state.copy(loading = false, data = null, error = action.error) to emptySet()
+            UpdateResponse(
+                state = state.copy(loading = false, data = null, error = action.error)
+            )
     }
 }
 

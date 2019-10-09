@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.collect
 @UseExperimental(ExperimentalCoroutinesApi::class)
 class MviFeature<Action, SideEffect, State, Subscription>(
     initialState: State,
-    private val update: Updater<State, Action, SideEffect>,
+    private val update: Updater<State, Action, Subscription, SideEffect>,
     private val effectHandler: EffectHandler<SideEffect, Action>,
     private val onError: ((State, Throwable) -> Unit)? = null
 ) : Feature<Action, SideEffect, State, Subscription> {
@@ -30,14 +30,17 @@ class MviFeature<Action, SideEffect, State, Subscription>(
 
     override val states = ConflatedBroadcastChannel(initialState)
 
+    override val subscriptions = Channel<Subscription>()
+
     override val featureScope =
         CoroutineScope(Dispatchers.Default) + SupervisorJob() + exceptionHandler
 
     init {
         featureScope.launch {
             actions.consumeEach { action ->
-                val (state, sideEffects) = update(currentState, action)
+                val (state, subscription, sideEffects) = update(currentState, action)
                 states.send(state)
+                subscription?.let { subscriptions.send(it) }
                 sideEffects.forEach(::call)
             }
         }

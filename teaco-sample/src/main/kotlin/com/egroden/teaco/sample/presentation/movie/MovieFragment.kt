@@ -26,7 +26,7 @@ class MovieFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connector.connect(::render, lifecycle)
+        connector.connect(::render, ::render, lifecycle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,6 +64,8 @@ class MovieFragment(
             view?.context?.toast(state.error.toString())
         }
     }
+
+    private fun render(subscription: Subscription) = Unit
 
     override fun onDestroyView() {
         super.onDestroyView()

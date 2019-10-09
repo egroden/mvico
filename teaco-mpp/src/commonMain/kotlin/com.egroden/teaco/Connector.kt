@@ -23,6 +23,13 @@ class Connector<Action, SideEffect, State, Subscription>(
         }
     }
 
+    @UseExperimental(ObsoleteCoroutinesApi::class)
+    fun connect(render: Render<Subscription>) {
+        renderScope.launch {
+            feature.subscriptions.consumeEach(render)
+        }
+    }
+
     fun disconnect() =
         renderScope.coroutineContext.cancelChildren()
 }

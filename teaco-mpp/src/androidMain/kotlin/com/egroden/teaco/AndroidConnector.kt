@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 @UseExperimental(ObsoleteCoroutinesApi::class)
 class AndroidConnector<Action, SideEffect, State, Subscription>(
     initialState: State,
-    update: Updater<State, Action, SideEffect>,
+    update: Updater<State, Action, Subscription, SideEffect>,
     effectHandler: EffectHandler<SideEffect, Action>,
     onError: ((State, Throwable) -> Unit)? = null,
     private val savedStateHandle: SavedStateHandle
@@ -38,13 +38,19 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
     infix fun bindAction(action: Action) =
         connector bindAction action
 
-    fun connect(render: Render<State>, lifecycle: Lifecycle) {
+    fun connect(
+        renderState: Render<State>,
+        renderSubscription: Render<Subscription>,
+        lifecycle: Lifecycle
+    ) {
         lifecycle.addObserver(
             LifecycleEventObserver { _, event: Lifecycle.Event ->
-                if (event == Lifecycle.Event.ON_START)
-                    connector.connect(render)
-                else if (event == Lifecycle.Event.ON_STOP)
+                if (event == Lifecycle.Event.ON_START) {
+                    connector.connect(renderState)
+                    connector.connect(renderSubscription)
+                } else if (event == Lifecycle.Event.ON_STOP) {
                     connector.disconnect()
+                }
             }
         )
     }
