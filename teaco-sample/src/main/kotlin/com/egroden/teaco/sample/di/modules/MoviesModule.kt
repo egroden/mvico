@@ -1,7 +1,6 @@
 package com.egroden.teaco.sample.di.modules
 
-import androidx.lifecycle.SavedStateHandle
-import com.egroden.teaco.AndroidConnector
+import com.egroden.teaco.TeaFeature
 import com.egroden.teaco.sample.BuildConfig
 import com.egroden.teaco.sample.data.network.NetworkClient
 import com.egroden.teaco.sample.data.repo.MovieRepository
@@ -24,14 +23,11 @@ class MoviesModule(private val apiModule: ApiModule) {
         MovieRepository(networkClient)
     }
 
-    val factory: (SavedStateHandle) -> AndroidConnector<Action, SideEffect, State, Subscription> = {
-        AndroidConnector(
+    val teaFeature: TeaFeature<Action, SideEffect, State, Subscription> by lazy {
+        TeaFeature(
             initialState = State(false, null, null),
             update = movieUpdater,
-            effectHandler = MovieEffectHandler(
-                moviesRepository
-            ),
-            savedStateHandle = it
+            effectHandler = MovieEffectHandler(moviesRepository)
         )
     }
 }

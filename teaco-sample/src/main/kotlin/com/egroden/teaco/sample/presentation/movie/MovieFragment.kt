@@ -3,19 +3,22 @@ package com.egroden.teaco.sample.presentation.movie
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.SavedStateHandle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.egroden.teaco.AndroidConnector
+import com.egroden.teaco.TeaFeature
 import com.egroden.teaco.androidConnectors
+import com.egroden.teaco.bindAction
+import com.egroden.teaco.connect
 import com.egroden.teaco.sample.R
 import com.egroden.teaco.sample.presentation.*
 import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
 import kotlinx.android.synthetic.main.movie_fragment.view.*
 
 class MovieFragment(
-    factory: (SavedStateHandle) -> AndroidConnector<Action, SideEffect, State, Subscription>
+    feature: TeaFeature<Action, SideEffect, State, Subscription>
 ) : Fragment(R.layout.movie_fragment) {
-    private val connector by androidConnectors(factory)
+    private val connector by androidConnectors(feature) {
+        bindAction(Action.LoadAction(1))
+    }
 
     private val recyclerValueEffect =
         Effect<List<MovieModel>>(emptyList())
@@ -44,8 +47,6 @@ class MovieFragment(
             visibility(Visibility.GONE)
             progressBarEffect bind { visibility(it) }
         }
-
-        connector bindAction Action.LoadAction(1)
     }
 
     private fun render(state: State) {

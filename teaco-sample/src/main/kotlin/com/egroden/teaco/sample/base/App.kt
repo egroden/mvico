@@ -4,10 +4,10 @@ import android.app.Application
 import com.egroden.teaco.sample.di.AppDi
 
 class App : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        val di = AppDi()
-        registerActivityLifecycleCallbacks(di.activityInjector)
+    private val di: AppDi by lazy {
+        AppDi(applicationContext)
     }
+
+    fun inject(activity: AppActivity) =
+        di.activityInjector.inject(activity)
 }

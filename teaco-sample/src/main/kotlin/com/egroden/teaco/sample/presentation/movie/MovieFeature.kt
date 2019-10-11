@@ -2,9 +2,9 @@ package com.egroden.teaco.sample.presentation.movie
 
 import android.os.Parcelable
 import com.egroden.teaco.EffectHandler
+import com.egroden.teaco.Either
 import com.egroden.teaco.UpdateResponse
 import com.egroden.teaco.Updater
-import com.egroden.teaco.sample.Either
 import com.egroden.teaco.sample.data.repo.MovieRepository
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -68,15 +68,11 @@ class MovieEffectHandler(
             is SideEffect.LoadMovies ->
                 when (val result = movieRepository.loadMovies(sideEffect.page)) {
                     is Either.Left -> emit(
-                        Action.ShowError(
-                            result.value
-                        )
+                        Action.ShowError(result.value)
                     )
 
                     is Either.Right -> emit(
-                        Action.ShowResult(
-                            result.value.map(MovieMapper::toModel)
-                        )
+                        Action.ShowResult(result.value.map(MovieMapper::toModel))
                     )
                 }
         }

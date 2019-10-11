@@ -10,7 +10,7 @@ class AppFragmentFactory(
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return when (className) {
-            MovieFragment::class.java.name -> MovieFragment(moviesModule.factory)
+            MovieFragment::class.java.name -> MovieFragment(moviesModule.teaFeature)
             else -> super.instantiate(classLoader, className)
         }
     }

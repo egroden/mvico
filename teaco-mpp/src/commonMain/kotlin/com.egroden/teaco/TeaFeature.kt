@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.collect
  * @param onError Function for handling unhandled exceptions.
  */
 @UseExperimental(ExperimentalCoroutinesApi::class)
-class MviFeature<Action, SideEffect, State, Subscription>(
-    initialState: State,
+data class TeaFeature<Action, SideEffect, State, Subscription>(
+    override val initialState: State,
     private val update: Updater<State, Action, Subscription, SideEffect>,
     private val effectHandler: EffectHandler<SideEffect, Action>,
     private val onError: ((State, Throwable) -> Unit)? = null
