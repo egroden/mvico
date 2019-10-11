@@ -8,7 +8,9 @@ apply plugin: 'com.android.library'
 apply plugin: "org.jetbrains.kotlin.multiplatform"
 
 kotlin {
-    android()
+    android() {
+        publishLibraryVariants("release")
+    }
     // This is for iPhone emulator
     // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
     iosX64("ios") {
@@ -26,8 +28,8 @@ kotlin {
         }
         commonTest {
             dependencies {
-        		implementation kotlin('test-common')
-        		implementation kotlin('test-annotations-common')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
             }
         }
         androidMain {
@@ -75,11 +77,6 @@ android {
         minSdkVersion 16
         targetSdkVersion 29
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
 
     sourceSets {
         main {
@@ -114,3 +111,5 @@ task copyFramework {
         }
     }
 }
+
+apply from: rootProject.file('gradle/publish.gradle')

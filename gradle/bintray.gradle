@@ -1,0 +1,27 @@
+bintray {
+    Properties keyProps = new Properties()
+    def keyFile = project.rootProject.file('local.properties')
+    if (keyFile.exists()) keyFile.withInputStream { keyProps.load(it) }
+
+    user = keyProps.getProperty("BINTRAY_USERNAME")
+    key = keyProps.getProperty("BINTRAY_API_KEY")
+    publications = ['maven']
+    publish = true
+    override = true
+
+    pkg {
+        repo = BINTRAY_REPOSITORY
+        name = ARTIFACT_ID
+        userOrg = BINTRAY_ORGINIZATION
+        licenses = ['Apache-2.0']
+        vcsUrl = VCS_URL
+        websiteUrl = SITE_URL
+        issueTrackerUrl = ISSUE_URL
+
+        version {
+            name = LIBRARY_VERSION_NAME
+            vcsTag = LIBRARY_VERSION_NAME
+            released = new Date()
+        }
+    }
+}

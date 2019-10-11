@@ -1,3 +1,5 @@
 rootProject.name = 'teaco'
 
+enableFeaturePreview("GRADLE_METADATA")
+
 include ':teaco-mpp', ':teaco-sample'
