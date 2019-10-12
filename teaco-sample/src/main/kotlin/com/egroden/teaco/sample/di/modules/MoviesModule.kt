@@ -1,5 +1,6 @@
 package com.egroden.teaco.sample.di.modules
 
+import com.egroden.teaco.StateParser
 import com.egroden.teaco.TeaFeature
 import com.egroden.teaco.sample.BuildConfig
 import com.egroden.teaco.sample.data.network.NetworkClient
@@ -11,11 +12,13 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class MoviesModule(private val apiModule: ApiModule) {
     @UseExperimental(UnstableDefault::class)
+    private val json: Json by lazy { Json.nonstrict }
+
     private val networkClient: NetworkClient by lazy {
         NetworkClient(
             client = apiModule.networkProvider.client,
             baseUrl = BuildConfig.API_URL.toHttpUrlOrNull()!!,
-            json = Json.nonstrict
+            json = json
         )
     }
 
@@ -25,9 +28,15 @@ class MoviesModule(private val apiModule: ApiModule) {
 
     val teaFeature: TeaFeature<Action, SideEffect, State, Subscription> by lazy {
         TeaFeature(
-            initialState = State(false, null, null),
+            initialState = State(false, null),
             update = movieUpdater,
             effectHandler = MovieEffectHandler(moviesRepository)
         )
+    }
+
+    val stateParser: StateParser<State> = { state: State ->
+        json.stringify(State.serializer(), state)
+    } to { string: String ->
+        json.parse(State.serializer(), string)
     }
 }

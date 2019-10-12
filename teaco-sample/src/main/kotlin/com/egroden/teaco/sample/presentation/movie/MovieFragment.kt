@@ -4,19 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.egroden.teaco.TeaFeature
-import com.egroden.teaco.androidConnectors
-import com.egroden.teaco.bindAction
-import com.egroden.teaco.connect
+import com.egroden.teaco.*
 import com.egroden.teaco.sample.R
 import com.egroden.teaco.sample.presentation.*
 import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
 import kotlinx.android.synthetic.main.movie_fragment.view.*
 
 class MovieFragment(
-    feature: TeaFeature<Action, SideEffect, State, Subscription>
+    feature: TeaFeature<Action, SideEffect, State, Subscription>,
+    stateParser: StateParser<State>
 ) : Fragment(R.layout.movie_fragment) {
-    private val connector by androidConnectors(feature) {
+    private val connector by androidConnectors(feature, stateParser) {
         bindAction(Action.LoadAction(1))
     }
 
@@ -59,14 +57,15 @@ class MovieFragment(
         }
 
         state.data?.let { recyclerValueEffect.value = it }
-        if (state.error != null) {
-            progressBarEffect.value = Visibility.GONE
-            recyclerVisibilityEffect.value = Visibility.GONE
-            view?.context?.toast(state.error.toString())
-        }
     }
 
-    private fun render(subscription: Subscription) = Unit
+    private fun render(subscription: Subscription) {
+        subscription.error?.let {
+            progressBarEffect.value = Visibility.GONE
+            recyclerVisibilityEffect.value = Visibility.GONE
+            view?.context?.toast(it.toString())
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
