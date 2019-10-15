@@ -1,16 +1,15 @@
 package com.egroden.teaco
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
 import kotlin.jvm.JvmName
 
 class Connector<Action, SideEffect, State, Subscription>(
-    val renderScope: CoroutineScope,
+    renderScope: CoroutineScope,
     val feature: Feature<Action, SideEffect, State, Subscription>
-)
+) {
+    val renderScope = renderScope.plus(SupervisorJob())
+}
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
     action: Action
@@ -40,4 +39,4 @@ fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, Stat
 }
 
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() =
-    renderScope.coroutineContext.cancelChildren()
+    renderScope.cancel()

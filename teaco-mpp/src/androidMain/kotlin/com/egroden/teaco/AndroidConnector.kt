@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -68,19 +71,10 @@ infix fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, Sid
 
 fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
-    renderSubscription: Render<Subscription>,
-    lifecycle: Lifecycle
+    renderSubscription: Render<Subscription>
 ) {
-    lifecycle.addObserver(
-        LifecycleEventObserver { _, event: Lifecycle.Event ->
-            if (event == Lifecycle.Event.ON_START) {
-                connector.connect(renderState)
-                connector.connect(renderSubscription)
-            } else if (event == Lifecycle.Event.ON_STOP) {
-                connector.disconnect()
-            }
-        }
-    )
+    connector.connect(renderState)
+    connector.connect(renderSubscription)
 }
 
 fun <Action, SideEffect, State, Subscription> Fragment.androidConnectors(
