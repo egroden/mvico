@@ -11,10 +11,9 @@ import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
 import kotlinx.android.synthetic.main.movie_fragment.view.*
 
 class MovieFragment(
-    feature: TeaFeature<Action, SideEffect, State, Subscription>,
-    stateParser: StateParser<State>
+    feature: TeaFeature<Action, SideEffect, State, Subscription>
 ) : Fragment(R.layout.movie_fragment) {
-    private val connector by androidConnectors(feature, stateParser) {
+    private val connector by androidConnectors(feature) {
         bindAction(Action.LoadAction(1))
     }
 
@@ -27,7 +26,7 @@ class MovieFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connector.connect(::render, ::render, lifecycle)
+        connector.connect(::render, ::render)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,6 +1,5 @@
 package com.egroden.teaco.sample.di.modules
 
-import com.egroden.teaco.StateParser
 import com.egroden.teaco.TeaFeature
 import com.egroden.teaco.sample.BuildConfig
 import com.egroden.teaco.sample.data.network.NetworkClient
@@ -32,11 +31,5 @@ class MoviesModule(private val apiModule: ApiModule) {
             update = movieUpdater,
             effectHandler = MovieEffectHandler(moviesRepository)
         )
-    }
-
-    val stateParser: StateParser<State> = { state: State ->
-        json.stringify(State.serializer(), state)
-    } to { string: String ->
-        json.parse(State.serializer(), string)
     }
 }
