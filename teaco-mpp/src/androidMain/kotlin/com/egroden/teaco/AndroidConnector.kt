@@ -10,7 +10,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -32,7 +31,7 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
                 initialState = savedStateHandle.get<State>(stateKey) ?: teaFeature.initialState
             )
         )
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch {
             connector.feature.states.consumeEach {
                 savedStateHandle.set(stateKey, it)
             }
