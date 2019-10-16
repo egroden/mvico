@@ -1,14 +1,31 @@
 package com.egroden.teaco
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
-import kotlin.jvm.JvmName
+import kotlinx.coroutines.launch
 
+@UseExperimental(ObsoleteCoroutinesApi::class)
 class Connector<Action, SideEffect, State, Subscription>(
-    renderScope: CoroutineScope,
+    val renderScope: CoroutineScope,
     val feature: Feature<Action, SideEffect, State, Subscription>
 ) {
-    val renderScope = renderScope.plus(SupervisorJob())
+    var renderState: Render<State>? = null
+    var renderSubscription: Render<Subscription>? = null
+
+    init {
+        renderScope.launch {
+            feature.states.consumeEach {
+                renderState?.invoke(it)
+            }
+        }
+        renderScope.launch {
+            feature.subscriptions.consumeEach {
+                renderSubscription?.invoke(it)
+            }
+        }
+    }
 }
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
@@ -19,24 +36,20 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
     }
 }
 
-@UseExperimental(ObsoleteCoroutinesApi::class)
+@UseExperimental(ExperimentalCoroutinesApi::class)
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
-    render: Render<State>
+    renderState: Render<State>,
+    renderSubscription: Render<Subscription>
 ) {
-    renderScope.launch {
-        feature.states.consumeEach(render)
-    }
+    // subscribe on next updates
+    this.renderState = renderState
+    this.renderSubscription = renderSubscription
+
+    // show current state
+    feature.states.valueOrNull?.let { renderState(it) }
 }
 
-@UseExperimental(ObsoleteCoroutinesApi::class)
-@JvmName("connectSubscription")
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
-    render: Render<Subscription>
-) {
-    renderScope.launch {
-        feature.subscriptions.consumeEach(render)
-    }
+fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {
+    renderState = null
+    renderSubscription = null
 }
-
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() =
-    renderScope.cancel()
