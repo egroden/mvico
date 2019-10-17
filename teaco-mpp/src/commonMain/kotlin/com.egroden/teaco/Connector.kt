@@ -2,30 +2,18 @@ package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
-@UseExperimental(ObsoleteCoroutinesApi::class)
 class Connector<Action, SideEffect, State, Subscription>(
     val renderScope: CoroutineScope,
     val feature: Feature<Action, SideEffect, State, Subscription>
 ) {
-    var renderState: Render<State>? = null
-    var renderSubscription: Render<Subscription>? = null
+    companion object
 
-    init {
-        renderScope.launch {
-            feature.states.consumeEach {
-                renderState?.invoke(it)
-            }
-        }
-        renderScope.launch {
-            feature.subscriptions.consumeEach {
-                renderSubscription?.invoke(it)
-            }
-        }
-    }
+    var statusReceiveChannel: ReceiveChannel<State>? = null
+    var subscriptionReceiveChannel: ReceiveChannel<Subscription>? = null
 }
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
@@ -41,15 +29,23 @@ fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, Stat
     renderState: Render<State>,
     renderSubscription: Render<Subscription>
 ) {
-    // subscribe on next updates
-    this.renderState = renderState
-    this.renderSubscription = renderSubscription
+    val status: ReceiveChannel<State> = feature.states.openSubscription()
+    val subscription: ReceiveChannel<Subscription> = feature.subscriptions.openSubscription()
 
-    // show current state
-    feature.states.valueOrNull?.let { renderState(it) }
+    renderScope.launch {
+        status.consumeEach(renderState::invoke)
+    }
+    renderScope.launch {
+        subscription.consumeEach(renderSubscription::invoke)
+    }
+
+    statusReceiveChannel = status
+    subscriptionReceiveChannel = subscription
 }
 
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {
-    renderState = null
-    renderSubscription = null
+    statusReceiveChannel?.cancel()
+    statusReceiveChannel = null
+    subscriptionReceiveChannel?.cancel()
+    subscriptionReceiveChannel = null
 }

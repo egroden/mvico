@@ -2,6 +2,7 @@ package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 
@@ -37,7 +38,7 @@ interface Feature<Action, SideEffect, State, Subscription> {
     /**
      * Channel of single actions. Used for one-time event.
      */
-    val subscriptions: Channel<out Subscription>
+    val subscriptions: BroadcastChannel<out Subscription>
 
     /**
      * Scope for unidirectional data flow.
