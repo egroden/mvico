@@ -13,9 +13,6 @@ class Connector<Action, SideEffect, State, Subscription>(
     val feature: Feature<Action, SideEffect, State, Subscription>
 ) {
     companion object
-
-    var statusReceiveChannel: ReceiveChannel<State>? = null
-    var subscriptionReceiveChannel: ReceiveChannel<Subscription>? = null
 }
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
@@ -30,33 +27,23 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
     renderSubscription: Render<Subscription>
-) {
-    renderScope.launch {
-        feature.statuses
-            .openSubscription()
-            .also {
-                statusReceiveChannel = it
-            }
-            .consumeAsFlow()
-            .distinctUntilChanged()
-            .collect { renderState(it) }
-    }
-    renderScope.launch {
-        feature.subscriptions
-            .openSubscription()
-            .also {
-                it.poll()
-                subscriptionReceiveChannel = it
-            }
-            .consumeAsFlow()
-            .distinctUntilChanged()
-            .collect { renderSubscription(it) }
-    }
-}
+): Connection<State, Subscription> {
+    val statusReceiveChannel: ReceiveChannel<State>
+    val subscriptionReceiveChannel: ReceiveChannel<Subscription>
 
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {
-    statusReceiveChannel?.cancel()
-    statusReceiveChannel = null
-    subscriptionReceiveChannel?.cancel()
-    subscriptionReceiveChannel = null
+    val statesFlow = feature.states
+        .openSubscription()
+        .also { statusReceiveChannel = it }
+        .consumeAsFlow()
+        .distinctUntilChanged()
+    val subscriptionsFlow = feature.subscriptions
+        .openSubscription()
+        .also { subscriptionReceiveChannel = it }
+        .consumeAsFlow()
+        .distinctUntilChanged()
+
+    renderScope.launch { statesFlow.collect { renderState(it) } }
+    renderScope.launch { subscriptionsFlow.collect { renderSubscription(it) } }
+
+    return Connection(statusReceiveChannel, subscriptionReceiveChannel)
 }

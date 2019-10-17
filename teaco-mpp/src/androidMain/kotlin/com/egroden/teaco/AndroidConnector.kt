@@ -29,7 +29,7 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
             )
         )
         viewModelScope.launch {
-            connector.feature.statuses.consumeEach {
+            connector.feature.states.consumeEach {
                 savedStateHandle.set(stateKey, it)
             }
         }
@@ -63,12 +63,15 @@ fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffec
     renderSubscription: Render<Subscription>,
     lifecycle: Lifecycle
 ) {
+    var connection: Connection<State, Subscription>? = null
     lifecycle.addObserver(
         LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START)
-                connector.connect(renderState, renderSubscription)
-            else if (event == Lifecycle.Event.ON_STOP)
-                connector.disconnect()
+            if (event == Lifecycle.Event.ON_START) {
+                connection = connector.connect(renderState, renderSubscription)
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                connection?.cancel()
+                connection = null
+            }
         }
     )
 }

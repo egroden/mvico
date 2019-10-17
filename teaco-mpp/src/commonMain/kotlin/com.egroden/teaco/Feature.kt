@@ -15,7 +15,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 @UseExperimental(ExperimentalCoroutinesApi::class)
 interface Feature<Action, SideEffect, State, Subscription> {
     /**
-     * Default state for [statuses].
+     * Default state for [states].
      */
     val initialState: State
 
@@ -32,7 +32,7 @@ interface Feature<Action, SideEffect, State, Subscription> {
     /**
      * States channel. Used to notify of a state change.
      */
-    val statuses: ConflatedBroadcastChannel<out State>
+    val states: ConflatedBroadcastChannel<out State>
 
     /**
      * Channel of single actions. Used for one-time event.

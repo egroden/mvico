@@ -24,11 +24,11 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
     }
 
     override val currentState: State
-        get() = statuses.value
+        get() = states.value
 
     override val actions = Channel<Action>()
 
-    override val statuses = ConflatedBroadcastChannel(initialState)
+    override val states = ConflatedBroadcastChannel(initialState)
 
     override val subscriptions = ConflatedBroadcastChannel<Subscription>()
 
@@ -39,7 +39,7 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
         featureScope.launch {
             actions.consumeEach { action ->
                 val (state, subscription, sideEffects) = update(currentState, action)
-                statuses.send(state)
+                states.send(state)
                 subscription?.let { subscriptions.send(it) }
                 sideEffects.forEach(::call)
             }
