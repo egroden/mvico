@@ -30,7 +30,7 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
 
     override val statuses = ConflatedBroadcastChannel(initialState)
 
-    override val subscriptions = ConflatedBroadcastChannel<Event<Subscription>>()
+    override val subscriptions = ConflatedBroadcastChannel<Subscription>()
 
     override val featureScope =
         CoroutineScope(Dispatchers.Default) + SupervisorJob() + exceptionHandler

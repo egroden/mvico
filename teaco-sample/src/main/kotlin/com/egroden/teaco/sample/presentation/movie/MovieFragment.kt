@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.egroden.teaco.*
+import com.egroden.teaco.TeaFeature
+import com.egroden.teaco.androidConnectors
+import com.egroden.teaco.bindAction
+import com.egroden.teaco.connect
 import com.egroden.teaco.sample.R
 import com.egroden.teaco.sample.presentation.*
 import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
@@ -58,14 +61,11 @@ class MovieFragment(
         state.data?.let { recyclerValueEffect.value = it }
     }
 
-    private fun render(subscriptionEvent: Event<Subscription>) {
-        subscriptionEvent.getIfNotUsed { subscription ->
-            subscription.error?.let {
-                progressBarEffect.value = Visibility.GONE
-                recyclerVisibilityEffect.value = Visibility.GONE
-                view?.context?.toast(it.toString())
-            }
-            subscriptionEvent.markAsUsed()
+    private fun render(subscription: Subscription) {
+        subscription.error?.let {
+            progressBarEffect.value = Visibility.GONE
+            recyclerVisibilityEffect.value = Visibility.GONE
+            view?.context?.toast(it.toString())
         }
     }
 

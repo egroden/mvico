@@ -1,7 +1,10 @@
 package com.egroden.teaco.sample.presentation.movie
 
 import android.os.Parcelable
-import com.egroden.teaco.*
+import com.egroden.teaco.EffectHandler
+import com.egroden.teaco.Either
+import com.egroden.teaco.UpdateResponse
+import com.egroden.teaco.Updater
 import com.egroden.teaco.sample.data.repo.MovieRepository
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +57,7 @@ val movieUpdater: Updater<State, Action, Subscription, SideEffect> = { state, ac
         is Action.ShowError ->
             UpdateResponse(
                 state = state.copy(loading = false, data = null),
-                subscription = Event.Reusable(Subscription(action.error))
+                subscription = Subscription(action.error)
             )
     }
 }

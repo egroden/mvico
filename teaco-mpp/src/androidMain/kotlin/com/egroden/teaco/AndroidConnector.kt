@@ -60,7 +60,7 @@ infix fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, Sid
 
 fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
-    renderSubscription: Render<Event<Subscription>>,
+    renderSubscription: Render<Subscription>,
     lifecycle: Lifecycle
 ) {
     lifecycle.addObserver(

@@ -37,7 +37,7 @@ interface Feature<Action, SideEffect, State, Subscription> {
     /**
      * Channel of single actions. Used for one-time event.
      */
-    val subscriptions: ConflatedBroadcastChannel<Event<Subscription>>
+    val subscriptions: ConflatedBroadcastChannel<out Subscription>
 
     /**
      * Scope for unidirectional data flow.

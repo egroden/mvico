@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class Connector<Action, SideEffect, State, Subscription>(
@@ -15,7 +15,7 @@ class Connector<Action, SideEffect, State, Subscription>(
     companion object
 
     var statusReceiveChannel: ReceiveChannel<State>? = null
-    var subscriptionReceiveChannel: ReceiveChannel<Event<Subscription>>? = null
+    var subscriptionReceiveChannel: ReceiveChannel<Subscription>? = null
 }
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
@@ -29,21 +29,27 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
 @UseExperimental(ExperimentalCoroutinesApi::class)
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
-    renderSubscription: Render<Event<Subscription>>
+    renderSubscription: Render<Subscription>
 ) {
     renderScope.launch {
         feature.statuses
             .openSubscription()
-            .also { statusReceiveChannel = it }
+            .also {
+                statusReceiveChannel = it
+            }
             .consumeAsFlow()
+            .distinctUntilChanged()
             .collect { renderState(it) }
     }
     renderScope.launch {
         feature.subscriptions
             .openSubscription()
-            .also { subscriptionReceiveChannel = it }
+            .also {
+                it.poll()
+                subscriptionReceiveChannel = it
+            }
             .consumeAsFlow()
-            .filter { (it as? Event.Reusable)?.pending ?: true }
+            .distinctUntilChanged()
             .collect { renderSubscription(it) }
     }
 }
