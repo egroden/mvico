@@ -26,7 +26,7 @@ class MovieFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connector.connect(::render, ::render)
+        connector.connect(::render, ::render, lifecycle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,11 +58,14 @@ class MovieFragment(
         state.data?.let { recyclerValueEffect.value = it }
     }
 
-    private fun render(subscription: Subscription) {
-        subscription.error?.let {
-            progressBarEffect.value = Visibility.GONE
-            recyclerVisibilityEffect.value = Visibility.GONE
-            view?.context?.toast(it.toString())
+    private fun render(subscriptionEvent: Event<Subscription>) {
+        subscriptionEvent.getIfNotUsed { subscription ->
+            subscription.error?.let {
+                progressBarEffect.value = Visibility.GONE
+                recyclerVisibilityEffect.value = Visibility.GONE
+                view?.context?.toast(it.toString())
+            }
+            subscriptionEvent.markAsUsed()
         }
     }
 

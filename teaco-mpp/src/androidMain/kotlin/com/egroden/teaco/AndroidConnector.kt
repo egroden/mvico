@@ -29,7 +29,7 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
             )
         )
         viewModelScope.launch {
-            connector.feature.states.consumeEach {
+            connector.feature.statuses.consumeEach {
                 savedStateHandle.set(stateKey, it)
             }
         }
@@ -60,7 +60,7 @@ infix fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, Sid
 
 fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
-    renderSubscription: Render<Subscription>,
+    renderSubscription: Render<Event<Subscription>>,
     lifecycle: Lifecycle
 ) {
     lifecycle.addObserver(

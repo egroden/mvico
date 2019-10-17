@@ -2,7 +2,6 @@ package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 
@@ -16,7 +15,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 @UseExperimental(ExperimentalCoroutinesApi::class)
 interface Feature<Action, SideEffect, State, Subscription> {
     /**
-     * Default state for [states].
+     * Default state for [statuses].
      */
     val initialState: State
 
@@ -33,12 +32,12 @@ interface Feature<Action, SideEffect, State, Subscription> {
     /**
      * States channel. Used to notify of a state change.
      */
-    val states: ConflatedBroadcastChannel<out State>
+    val statuses: ConflatedBroadcastChannel<out State>
 
     /**
      * Channel of single actions. Used for one-time event.
      */
-    val subscriptions: BroadcastChannel<out Subscription>
+    val subscriptions: ConflatedBroadcastChannel<Event<Subscription>>
 
     /**
      * Scope for unidirectional data flow.

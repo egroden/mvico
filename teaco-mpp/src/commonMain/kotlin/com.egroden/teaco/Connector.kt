@@ -3,7 +3,9 @@ package com.egroden.teaco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 class Connector<Action, SideEffect, State, Subscription>(
@@ -13,7 +15,7 @@ class Connector<Action, SideEffect, State, Subscription>(
     companion object
 
     var statusReceiveChannel: ReceiveChannel<State>? = null
-    var subscriptionReceiveChannel: ReceiveChannel<Subscription>? = null
+    var subscriptionReceiveChannel: ReceiveChannel<Event<Subscription>>? = null
 }
 
 infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.bindAction(
@@ -27,20 +29,23 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
 @UseExperimental(ExperimentalCoroutinesApi::class)
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
-    renderSubscription: Render<Subscription>
+    renderSubscription: Render<Event<Subscription>>
 ) {
-    val status: ReceiveChannel<State> = feature.states.openSubscription()
-    val subscription: ReceiveChannel<Subscription> = feature.subscriptions.openSubscription()
-
     renderScope.launch {
-        status.consumeEach(renderState::invoke)
+        feature.statuses
+            .openSubscription()
+            .also { statusReceiveChannel = it }
+            .consumeAsFlow()
+            .collect { renderState(it) }
     }
     renderScope.launch {
-        subscription.consumeEach(renderSubscription::invoke)
+        feature.subscriptions
+            .openSubscription()
+            .also { subscriptionReceiveChannel = it }
+            .consumeAsFlow()
+            .filter { (it as? Event.Reusable)?.pending ?: true }
+            .collect { renderSubscription(it) }
     }
-
-    statusReceiveChannel = status
-    subscriptionReceiveChannel = subscription
 }
 
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.disconnect() {

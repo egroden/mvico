@@ -1,7 +1,6 @@
 package com.egroden.teaco
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
@@ -25,13 +24,13 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
     }
 
     override val currentState: State
-        get() = states.value
+        get() = statuses.value
 
     override val actions = Channel<Action>()
 
-    override val states = ConflatedBroadcastChannel(initialState)
+    override val statuses = ConflatedBroadcastChannel(initialState)
 
-    override val subscriptions = BroadcastChannel<Subscription>(0)
+    override val subscriptions = ConflatedBroadcastChannel<Event<Subscription>>()
 
     override val featureScope =
         CoroutineScope(Dispatchers.Default) + SupervisorJob() + exceptionHandler
@@ -40,7 +39,7 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
         featureScope.launch {
             actions.consumeEach { action ->
                 val (state, subscription, sideEffects) = update(currentState, action)
-                states.send(state)
+                statuses.send(state)
                 subscription?.let { subscriptions.send(it) }
                 sideEffects.forEach(::call)
             }

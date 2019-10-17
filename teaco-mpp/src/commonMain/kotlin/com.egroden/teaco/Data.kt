@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 data class UpdateResponse<State, Subscription, SideEffect>(
     val state: State,
-    val subscription: Subscription? = null,
+    val subscription: Event<Subscription>? = null,
     val sideEffects: Set<SideEffect> = emptySet()
 )
 
