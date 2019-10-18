@@ -63,14 +63,14 @@ fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffec
     renderSubscription: Render<Subscription>,
     lifecycle: Lifecycle
 ) {
-    var connection: Connection<State, Subscription>? = null
+    var connectionJob: ConnectionJob? = null
     lifecycle.addObserver(
         LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                connection = connector.connect(renderState, renderSubscription)
+                connectionJob = connector.connect(renderState, renderSubscription)
             } else if (event == Lifecycle.Event.ON_STOP) {
-                connection?.cancel()
-                connection = null
+                connectionJob?.cancel()
+                connectionJob = null
             }
         }
     )

@@ -29,7 +29,7 @@ android {
 
             Properties properties = new Properties()
             properties.load(project.rootProject.file("local.properties").newDataInputStream())
-            buildConfigField 'String', "API_KEY", properties.getProperty("api_key", "")
+            buildConfigField 'String', "API_KEY", properties.getProperty("api_key", '""')
 
         }
         release {
