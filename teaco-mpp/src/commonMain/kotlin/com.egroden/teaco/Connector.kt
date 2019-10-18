@@ -2,9 +2,9 @@ package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.broadcast
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class Connector<Action, SideEffect, State, Subscription>(
@@ -26,18 +26,21 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
     renderSubscription: Render<Subscription>
-): ConnectionJob {
-    val statesFlow = feature.states
-        .openSubscription()
-        .consumeAsFlow()
-        .distinctUntilChanged()
+) = ConnectionJob(
+    statusJob = renderScope.launch {
+        feature.states
+            .asFlow()
+            .distinctUntilChanged()
+            .collect { renderState(it) }
+    },
+    subscriptionJob = renderScope.launch {
+        feature.subscriptions
+            .asFlow()
+            .distinctUntilChanged()
+            .collect { renderSubscription(it) }
+    }
+)
 
-    val subscriptionsFlow = feature.subscriptions
-        .consumeAsFlow()
-        .distinctUntilChanged()
-
-    return ConnectionJob(
-        statusJob = renderScope.launch { statesFlow.collect { renderState(it) } },
-        subscriptionJob = renderScope.launch { subscriptionsFlow.collect { renderSubscription(it) } }
-    )
+fun <T> Channel<T>.asFlow(): Flow<T> = flow {
+    for (elem in this@asFlow) emit(elem)
 }
