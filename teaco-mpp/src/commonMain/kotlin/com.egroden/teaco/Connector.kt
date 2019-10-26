@@ -2,9 +2,10 @@ package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.broadcast
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class Connector<Action, SideEffect, State, Subscription>(
@@ -22,7 +23,7 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
     }
 }
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
     renderSubscription: Render<Subscription>
@@ -40,7 +41,3 @@ fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, Stat
             .collect { renderSubscription(it) }
     }
 )
-
-fun <T> Channel<T>.asFlow(): Flow<T> = flow {
-    for (elem in this@asFlow) emit(elem)
-}

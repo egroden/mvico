@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
 class AndroidConnector<Action, SideEffect, State, Subscription>(
-    teaFeature: TeaFeature<Action, SideEffect, State, Subscription>,
+    featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>,
     onFirstStart: (AndroidConnector<Action, SideEffect, State, Subscription>.() -> Unit)?,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -22,24 +22,25 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
     private val stateKey = "android_connector"
 
     init {
-        connector = Connector(
-            renderScope = viewModelScope,
-            feature = teaFeature.copy(
-                initialState = savedStateHandle.get<State>(stateKey) ?: teaFeature.initialState
-            )
-        )
+        val feature = featureFactory(savedStateHandle.get<State>(stateKey))
+        connector = Connector(renderScope = viewModelScope, feature = feature)
         viewModelScope.launch {
-            connector.feature.states.consumeEach {
+            feature.states.consumeEach {
                 savedStateHandle.set(stateKey, it)
             }
         }
         onFirstStart?.invoke(this)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        connector.feature.cancel()
+    }
+
     class Factory<Action, SideEffect, State, Subscription>(
         owner: SavedStateRegistryOwner,
         defaultArgs: Bundle? = null,
-        private val feature: TeaFeature<Action, SideEffect, State, Subscription>,
+        private val featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>,
         private val onFirstStart: (AndroidConnector<Action, SideEffect, State, Subscription>.() -> Unit)?
     ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
         @Suppress("UNCHECKED_CAST")
@@ -48,7 +49,7 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
             modelClass: Class<T>,
             handle: SavedStateHandle
         ): T =
-            AndroidConnector(feature, onFirstStart, handle) as T
+            AndroidConnector(featureFactory, onFirstStart, handle) as T
     }
 }
 
@@ -77,13 +78,15 @@ fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffec
 }
 
 fun <Action, SideEffect, State, Subscription> Fragment.androidConnectors(
-    feature: TeaFeature<Action, SideEffect, State, Subscription>,
+    featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>,
     onFirstStart: (AndroidConnector<Action, SideEffect, State, Subscription>.() -> Unit)? = null
 ): Lazy<AndroidConnector<Action, SideEffect, State, Subscription>> =
-    viewModels { AndroidConnector.Factory(this, null, feature, onFirstStart) }
+    viewModels {
+        AndroidConnector.Factory(this, null, featureFactory, onFirstStart)
+    }
 
 fun <Action, SideEffect, State, Subscription> ComponentActivity.androidConnectors(
-    teaFeature: TeaFeature<Action, SideEffect, State, Subscription>,
+    featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>,
     onFirstStart: (AndroidConnector<Action, SideEffect, State, Subscription>.() -> Unit)? = null
 ): Lazy<AndroidConnector<Action, SideEffect, State, Subscription>> =
-    viewModels { AndroidConnector.Factory(this, null, teaFeature, onFirstStart) }
+    viewModels { AndroidConnector.Factory(this, null, featureFactory, onFirstStart) }

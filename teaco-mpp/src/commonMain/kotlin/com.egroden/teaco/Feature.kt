@@ -51,5 +51,10 @@ interface Feature<Action, SideEffect, State, Subscription> {
      * For example, download something from a network or database.
      */
     fun call(sideEffect: SideEffect)
+
+    /**
+     * Cancel current feature and close all coroutines and channels.
+     */
+    fun cancel()
 }
 

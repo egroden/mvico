@@ -37,10 +37,10 @@ kotlin {
                 implementation kotlin('stdlib')
 
                 implementation "androidx.appcompat:appcompat:1.1.0"
-                implementation "androidx.fragment:fragment-ktx:1.1.0-rc03"
+                implementation "androidx.fragment:fragment-ktx:1.2.0-rc01"
                 implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
                 implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-                implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-beta01"
+                implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc01"
 
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
             }
@@ -83,6 +83,15 @@ android {
         test {
             java.srcDirs = ['src/androidTest/kotlin']
         }
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 

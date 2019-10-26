@@ -53,4 +53,11 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
                 .collect { actions.send(it) }
         }
     }
+
+    override fun cancel() {
+        featureScope.cancel()
+        actions.cancel()
+        states.cancel()
+        subscriptions.cancel()
+    }
 }

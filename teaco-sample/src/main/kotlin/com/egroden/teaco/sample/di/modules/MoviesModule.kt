@@ -1,5 +1,6 @@
 package com.egroden.teaco.sample.di.modules
 
+import com.egroden.teaco.Feature
 import com.egroden.teaco.TeaFeature
 import com.egroden.teaco.sample.BuildConfig
 import com.egroden.teaco.sample.data.network.NetworkClient
@@ -25,11 +26,10 @@ class MoviesModule(private val apiModule: ApiModule) {
         MovieRepository(networkClient)
     }
 
-    val teaFeature: TeaFeature<Action, SideEffect, State, Subscription> by lazy {
+    fun createTeaFeature(oldState: State?): Feature<Action, SideEffect, State, Subscription> =
         TeaFeature(
-            initialState = State(false, null),
+            initialState = oldState ?: State(false, null),
             update = movieUpdater,
             effectHandler = MovieEffectHandler(moviesRepository)
         )
-    }
 }
