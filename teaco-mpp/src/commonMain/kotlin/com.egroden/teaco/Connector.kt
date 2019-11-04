@@ -1,11 +1,9 @@
 package com.egroden.teaco
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class Connector<Action, SideEffect, State, Subscription>(
@@ -23,7 +21,7 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
     }
 }
 
-@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@UseExperimental(FlowPreview::class)
 fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
     renderState: Render<State>,
     renderSubscription: Render<Subscription>
@@ -31,13 +29,11 @@ fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, Stat
     statusJob = renderScope.launch {
         feature.states
             .asFlow()
-            .distinctUntilChanged()
             .collect { renderState(it) }
     },
     subscriptionJob = renderScope.launch {
         feature.subscriptions
             .asFlow()
-            .distinctUntilChanged()
             .collect { renderSubscription(it) }
     }
 )
