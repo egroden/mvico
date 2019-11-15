@@ -8,16 +8,22 @@ apply plugin: 'com.android.library'
 apply plugin: "org.jetbrains.kotlin.multiplatform"
 
 kotlin {
-    android() {
-        publishLibraryVariants("release")
-    }
-    // This is for iPhone emulator
-    // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
-    iosX64("ios") {
-        binaries {
-            framework()
+    targets {
+        fromPreset(presets.android, 'android') {
+            publishLibraryVariants("release")
+        }
+
+        // This is for iPhone emulator
+        // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
+        def buildForDevice = project.findProperty("device")?.toBoolean() ?: false
+        def iosPreset = (buildForDevice) ? presets.iosArm64 : presets.iosX64
+        fromPreset(iosPreset, 'ios') {
+            binaries {
+                framework()
+            }
         }
     }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -37,10 +43,10 @@ kotlin {
                 implementation kotlin('stdlib')
 
                 implementation "androidx.appcompat:appcompat:1.1.0"
-                implementation "androidx.fragment:fragment-ktx:1.2.0-rc01"
+                implementation "androidx.fragment:fragment-ktx:1.2.0-rc02"
                 implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
                 implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-                implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc01"
+                implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02"
 
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
             }

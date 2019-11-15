@@ -51,6 +51,15 @@ android {
     configurations.all {
         resolutionStrategy.force "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha04"
     }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
