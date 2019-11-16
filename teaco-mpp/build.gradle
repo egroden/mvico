@@ -8,21 +8,15 @@ apply plugin: 'com.android.library'
 apply plugin: "org.jetbrains.kotlin.multiplatform"
 
 kotlin {
-    targets {
-        fromPreset(presets.android, 'android') {
-            publishLibraryVariants("release")
-        }
-
-        // This is for iPhone emulator
-        // Switch here to iosArm64 (or iosArm32) to build library for iPhone device
-        def buildForDevice = project.findProperty("device")?.toBoolean() ?: false
-        def iosPreset = (buildForDevice) ? presets.iosArm64 : presets.iosX64
-        fromPreset(iosPreset, 'ios') {
-            binaries {
-                framework()
-            }
+    android {
+        publishLibraryVariants("release")
+    }
+    iosArm64("ios") {
+        binaries {
+            framework()
         }
     }
+    iosX64("iosSim")
 
     sourceSets {
         commonMain {
