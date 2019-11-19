@@ -1,33 +1,30 @@
+plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.multiplatform"
+    id "maven-publish"
+    id "com.jfrog.bintray"
+}
+
 repositories {
     google()
     jcenter()
     mavenCentral()
 }
 
-apply plugin: 'com.android.library'
-apply plugin: "org.jetbrains.kotlin.multiplatform"
 
 kotlin {
     android {
         publishLibraryVariants("release")
     }
-    iosArm64 {
-        binaries {
-            framework()
-        }
-    }
-    iosX64 {
-        binaries {
-            framework()
-        }
-    }
+    iosArm64()
+    iosX64()
 
     sourceSets {
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
 
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutines_version"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutines_version"
             }
         }
         commonTest {
@@ -46,7 +43,7 @@ kotlin {
                 implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
                 implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02"
 
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
             }
         }
         androidTest {
@@ -57,7 +54,7 @@ kotlin {
         }
         iosMain {
             dependencies {
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:$coroutines_version"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:$coroutines_version"
             }
         }
         iosTest {
