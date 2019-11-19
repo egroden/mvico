@@ -11,19 +11,23 @@ kotlin {
     android {
         publishLibraryVariants("release")
     }
-    iosArm64("ios") {
+    iosArm64 {
         binaries {
             framework()
         }
     }
-    iosX64("iosSim")
+    iosX64 {
+        binaries {
+            framework()
+        }
+    }
 
     sourceSets {
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
 
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutines_version"
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutines_version"
             }
         }
         commonTest {
@@ -42,7 +46,7 @@ kotlin {
                 implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
                 implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02"
 
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
             }
         }
         androidTest {
@@ -53,10 +57,18 @@ kotlin {
         }
         iosMain {
             dependencies {
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:$coroutines_version"
+                api "org.jetbrains.kotlinx:kotlinx-coroutines-core-native:$coroutines_version"
             }
         }
         iosTest {
+        }
+
+        configure([iosArm64Main, iosX64Main]) {
+            dependsOn iosMain
+        }
+
+        configure([iosArm64Test, iosX64Test]) {
+            dependsOn iosTest
         }
 
         all {
@@ -100,7 +112,7 @@ android {
 // Xcode runs this task itself during its build process.
 // Before opening the project from iosApp directory in Xcode,
 // make sure all Gradle infrastructure exists (gradle.wrapper, gradlew).
-task copyFramework {
+/*task copyFramework {
     def buildType = project.findProperty('kotlin.build.type') ?: 'DEBUG'
     def target = project.findProperty('kotlin.target') ?: 'ios'
     dependsOn kotlin.targets."$target".binaries.getFramework(buildType).linkTask
@@ -115,6 +127,12 @@ task copyFramework {
             include 'app.framework.dSYM'
         }
     }
-}
+}*/
 
 apply from: rootProject.file('gradle/publish.gradle')
+
+
+// workaround for https://youtrack.jetbrains.com/issue/KT-27170
+configurations {
+    compileClasspath
+}
