@@ -66,7 +66,7 @@ dependencies {
     implementation project(':teaco-mpp')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
 
@@ -77,7 +77,7 @@ dependencies {
 
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0"
     implementation "com.github.bumptech.glide:glide:$glide_version"
 
