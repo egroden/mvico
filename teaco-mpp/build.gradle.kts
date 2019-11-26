@@ -9,7 +9,8 @@ plugins {
 }
 
 kotlin {
-    ios()
+    iosArm64("ios")
+    iosX64("iosSim")
     android {
         publishLibraryVariants("release", "debug")
         publishLibraryVariantsGroupedByFlavor = true
@@ -63,6 +64,8 @@ kotlin {
         }
         val iosTest by getting {
         }
+        val iosSimMain by getting { dependsOn(iosMain) }
+        val iosSimTest by getting { dependsOn(iosTest) }
     }
 }
 
