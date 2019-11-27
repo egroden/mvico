@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.egroden.teaco.Feature
-import com.egroden.teaco.androidConnectors
-import com.egroden.teaco.bindAction
-import com.egroden.teaco.connect
+import com.egroden.teaco.*
 import com.egroden.teaco.sample.R
 import com.egroden.teaco.sample.presentation.*
 import com.egroden.teaco.sample.presentation.movie.adapter.MovieAdapter
@@ -15,7 +12,7 @@ import kotlinx.android.synthetic.main.movie_fragment.view.*
 
 class MovieFragment(
     featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>
-) : Fragment(R.layout.movie_fragment) {
+) : Fragment(R.layout.movie_fragment), Render<State, Subscription> {
     private val connector by androidConnectors(featureFactory) {
         bindAction(Action.LoadAction(1))
     }
@@ -29,7 +26,7 @@ class MovieFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connector.connect(::render, ::render, lifecycle)
+        connector.connect(this, lifecycle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,7 +46,7 @@ class MovieFragment(
         }
     }
 
-    private fun render(state: State) {
+    override fun renderState(state: State) {
         if (state.loading) {
             progressBarEffect.value = Visibility.VISIBLE
             recyclerVisibilityEffect.value = Visibility.GONE
@@ -61,7 +58,7 @@ class MovieFragment(
         state.data?.let { recyclerValueEffect.value = it }
     }
 
-    private fun render(subscription: Subscription) {
+    override fun renderSubscription(subscription: Subscription) {
         subscription.error?.let {
             progressBarEffect.value = Visibility.GONE
             recyclerVisibilityEffect.value = Visibility.GONE

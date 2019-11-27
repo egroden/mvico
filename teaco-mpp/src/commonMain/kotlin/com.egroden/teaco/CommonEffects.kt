@@ -3,7 +3,9 @@ package com.egroden.teaco
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-typealias Eff<T> = () -> T
+interface Eff<T> {
+    fun invoke(): T
+}
 
 class CommonEffectHandler<Action> : EffectHandler<CommonEffectHandler.Effect<Action>, Action> {
     override fun invoke(sideEffect: Effect<Action>): Flow<Action> =

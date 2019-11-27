@@ -60,15 +60,14 @@ infix fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, Sid
     connector bindAction action
 
 fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffect, State, Subscription>.connect(
-    renderState: Render<State>,
-    renderSubscription: Render<Subscription>,
+    render: Render<State, Subscription>,
     lifecycle: Lifecycle
 ) {
     var connectionJob: ConnectionJob? = null
     lifecycle.addObserver(
         LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
-                connectionJob = connector.connect(renderState, renderSubscription)
+                connectionJob = connector.connect(render)
             } else if (event == Lifecycle.Event.ON_STOP) {
                 connectionJob?.cancel()
                 connectionJob = null

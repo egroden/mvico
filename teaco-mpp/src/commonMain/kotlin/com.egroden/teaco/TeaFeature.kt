@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.collect
 
 /**
  * @param initialState Initial state for Feature.
- * @param update Function for updating state and creating side effects.
+ * @param updater Function for updating state and creating side effects.
  * @param effectHandler Side effects handler
  * @param onError Function for handling unhandled exceptions.
  */
 @UseExperimental(ExperimentalCoroutinesApi::class)
 data class TeaFeature<Action, SideEffect, State, Subscription>(
     override val initialState: State,
-    private val update: Updater<State, Action, Subscription, SideEffect>,
+    private val updater: Updater<State, Action, Subscription, SideEffect>,
     private val effectHandler: EffectHandler<SideEffect, Action>,
     private val onError: ((State, Throwable) -> Unit)? = null
 ) : Feature<Action, SideEffect, State, Subscription> {
@@ -38,7 +38,7 @@ data class TeaFeature<Action, SideEffect, State, Subscription>(
     init {
         featureScope.launch {
             actions.consumeEach { action ->
-                val (state, subscription, sideEffects) = update(currentState, action)
+                val (state, subscription, sideEffects) = updater.invoke(currentState, action)
                 states.send(state)
                 subscription?.let { subscriptions.send(it) }
                 sideEffects.forEach(::call)

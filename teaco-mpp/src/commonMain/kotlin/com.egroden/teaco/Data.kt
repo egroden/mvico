@@ -18,8 +18,9 @@ data class UpdateResponse<State, Subscription, SideEffect>(
  * @return new state and a side effect to handle. If you don't wish to handle
  * a side-effect, return Pair<State, emptySet()> , otherwise return Pair<State, setOf()>
  */
-typealias Updater<State, Action, Subscription, SideEffect> =
-            (State, Action) -> UpdateResponse<State, Subscription, SideEffect>
+interface Updater<State, Action, Subscription, SideEffect> {
+    fun invoke(state: State, action: Action): UpdateResponse<State, Subscription, SideEffect>
+}
 
 /**
  * Called every time the MviFeature produces a new state. Used to display
@@ -27,11 +28,16 @@ typealias Updater<State, Action, Subscription, SideEffect> =
  *
  * @param State the latest state to display
  */
-typealias Render<State> = (State) -> Unit
+interface Render<State, Subscription> {
+    fun renderState(state: State)
+    fun renderSubscription(subscription: Subscription)
+}
 
 /**
  * Your business logic should be here.
  * @param SideEffect Type of side effects.
  * @param Action Type of actions with which the state will change.
  */
-typealias EffectHandler<SideEffect, Action> = (SideEffect) -> Flow<Action>
+interface EffectHandler<SideEffect, Action> {
+    fun invoke(sideEffect: SideEffect): Flow<Action>
+}

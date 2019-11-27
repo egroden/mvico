@@ -29,7 +29,7 @@ class MoviesModule(private val apiModule: ApiModule) {
     fun createTeaFeature(oldState: State?): Feature<Action, SideEffect, State, Subscription> =
         TeaFeature(
             initialState = oldState ?: State(false, null),
-            update = movieUpdater,
+            updater = movieUpdater,
             effectHandler = MovieEffectHandler(moviesRepository)
         )
 }
