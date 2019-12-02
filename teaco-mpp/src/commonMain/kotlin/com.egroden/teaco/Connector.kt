@@ -22,17 +22,18 @@ infix fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect
 }
 
 @UseExperimental(FlowPreview::class)
-fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
-    render: Render<State, Subscription>
+inline fun <Action, SideEffect, State, Subscription> Connector<Action, SideEffect, State, Subscription>.connect(
+    crossinline renderState: Render<State>,
+    crossinline renderSubscription: Render<Subscription>
 ) = ConnectionJob(
     statusJob = renderScope.launch {
         feature.states
             .asFlow()
-            .collect { render.renderState(it) }
+            .collect { renderState(it) }
     },
     subscriptionJob = renderScope.launch {
         feature.subscriptions
             .asFlow()
-            .collect { render.renderSubscription(it) }
+            .collect { renderSubscription(it) }
     }
 )

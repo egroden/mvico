@@ -43,27 +43,23 @@ class MovieModel(
     val rating: Double
 ) : Parcelable
 
-val movieUpdater = object : Updater<State, Action, Subscription, SideEffect> {
-    override fun invoke(
-        state: State,
-        action: Action
-    ): UpdateResponse<State, Subscription, SideEffect> =
-        when (action) {
-            is Action.LoadAction ->
-                UpdateResponse(
-                    state = state.copy(loading = true, data = null),
-                    sideEffects = setOf(SideEffect.LoadMovies(action.page))
-                )
-            is Action.ShowResult ->
-                UpdateResponse(
-                    state = state.copy(loading = false, data = action.result)
-                )
-            is Action.ShowError ->
-                UpdateResponse(
-                    state = state.copy(loading = false, data = null),
-                    subscription = Subscription(action.error)
-                )
-        }
+val movieUpdater: Updater<State, Action, Subscription, SideEffect> = { state, action ->
+    when (action) {
+        is Action.LoadAction ->
+            UpdateResponse(
+                state = state.copy(loading = true, data = null),
+                sideEffects = setOf(SideEffect.LoadMovies(action.page))
+            )
+        is Action.ShowResult ->
+            UpdateResponse(
+                state = state.copy(loading = false, data = action.result)
+            )
+        is Action.ShowError ->
+            UpdateResponse(
+                state = state.copy(loading = false, data = null),
+                subscription = Subscription(action.error)
+            )
+    }
 }
 
 class MovieEffectHandler(
