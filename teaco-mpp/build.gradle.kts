@@ -43,10 +43,10 @@ kotlin {
                 implementation(kotlin("stdlib"))
 
                 implementation("androidx.appcompat:appcompat:1.1.0")
-                implementation("androidx.fragment:fragment-ktx:1.2.0-rc02")
+                implementation("androidx.fragment:fragment-ktx:1.2.0-rc05")
                 implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
                 implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc03")
 
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
             }

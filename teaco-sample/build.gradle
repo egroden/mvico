@@ -78,7 +78,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
     implementation "com.github.bumptech.glide:glide:$glide_version"
 
     testImplementation 'junit:junit:4.12'
