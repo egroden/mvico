@@ -70,14 +70,6 @@ inline fun <A, B> Either<A, B>.filterOrOther(
         else Either.Left(default(it))
     }
 
-inline infix fun <A, B> Either<A, B?>.leftIfNull(crossinline default: () -> A): Either<A, B> =
-    flatMap { it.rightIfNotNull { default() } }
-
-inline infix fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
-    null -> Either.Left(default())
-    else -> Either.Right(this)
-}
-
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
 fun <A> A.right(): Either<Nothing, A> = Either.Right(this)

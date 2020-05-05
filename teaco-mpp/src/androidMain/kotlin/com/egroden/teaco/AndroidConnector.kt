@@ -11,7 +11,7 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
-@UseExperimental(ObsoleteCoroutinesApi::class)
+@OptIn(ObsoleteCoroutinesApi::class)
 class AndroidConnector<Action, SideEffect, State, Subscription>(
     featureFactory: (oldState: State?) -> Feature<Action, SideEffect, State, Subscription>,
     onFirstStart: (AndroidConnector<Action, SideEffect, State, Subscription>.() -> Unit)?,
@@ -52,7 +52,6 @@ class AndroidConnector<Action, SideEffect, State, Subscription>(
             AndroidConnector(featureFactory, onFirstStart, handle) as T
     }
 }
-
 
 infix fun <Action, SideEffect, State, Subscription> AndroidConnector<Action, SideEffect, State, Subscription>.bindAction(
     action: Action

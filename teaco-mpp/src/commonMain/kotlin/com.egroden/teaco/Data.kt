@@ -18,8 +18,7 @@ data class UpdateResponse<State, Subscription, SideEffect>(
  * @return new state and a side effect to handle. If you don't wish to handle
  * a side-effect, return Pair<State, emptySet()> , otherwise return Pair<State, setOf()>
  */
-typealias Updater<State, Action, Subscription, SideEffect> =
-            (State, Action) -> UpdateResponse<State, Subscription, SideEffect>
+typealias Updater<State, Action, Subscription, SideEffect> = (State, Action) -> UpdateResponse<State, Subscription, SideEffect>
 
 /**
  * Called every time the MviFeature produces a new state. Used to display

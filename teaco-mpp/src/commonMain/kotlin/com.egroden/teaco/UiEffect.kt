@@ -17,7 +17,6 @@ class UiEffect<T>(initialValue: T) {
     fun unbind() {
         change = null
     }
-
 }
 
 class UiEffectScope {

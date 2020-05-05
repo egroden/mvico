@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.collect
  * @param effectHandler Side effects handler
  * @param onError Function for handling unhandled exceptions.
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 data class TeaFeature<Action, SideEffect, State, Subscription>(
     override val initialState: State,
     private val updater: Updater<State, Action, Subscription, SideEffect>,

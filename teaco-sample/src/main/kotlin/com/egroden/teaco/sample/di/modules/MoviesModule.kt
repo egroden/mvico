@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class MoviesModule(private val apiModule: ApiModule) {
-    @UseExperimental(UnstableDefault::class)
+    @OptIn(UnstableDefault::class)
     private val json: Json by lazy { Json.nonstrict }
 
     private val networkClient: NetworkClient by lazy {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
  * @param State Type of state.
  * @param Subscription Type for one-time messages.
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 interface Feature<Action, SideEffect, State, Subscription> {
     /**
      * Default state for [states].
